@@ -1,0 +1,77 @@
+# Data Preprocessing Configuration for KITTI Dataset
+# This config is used by src/data/preprocess_dataset.py
+input:
+  raw_data_dir: "data/raw/KITTI/training"
+  image_subdir: "image_2"
+  label_subdir: "label_2"
+
+output:
+  processed_dir: "data/processed/kitti"
+  create_yolo_yaml: true  # Create data.yaml for YOLO training
+
+# Image preprocessing
+image_processing:
+  target_size: [640, 640]  
+  save_format: "jpg"  
+  jpeg_quality: 95  # Only for jpg format
+  normalize_pixels: false  # Done in dataloader during training
+
+# Label conversion (KITTI → YOLO format)
+label_conversion:
+  format: "yolo"  
+  
+  class_mapping:
+    # VEHICLES - Merge all vehicle types into single "Vehicle" class
+    # This covers Cars, Vans, and Trucks (85.73% of KITTI dataset)
+    Car: 0
+    Van: 0        # 7.18% of data - merged with Car
+    Truck: 0      # 2.70% of data - merged with Car
+    
+    # VULNERABLE ROAD USERS
+    Pedestrian: 1      # 11.06% of data
+    Person_sitting: 1  # 0.55% of data - merged with Pedestrian (similar behavior)
+    Cyclist: 2         # 4.01% of data
+    
+    # Note: Traffic signs NOT in KITTI! Will be added later
+  
+  # Classes to exclude (won't be included in output)
+  exclude_classes:
+    - "DontCare"  # Ambiguous annotations
+    - "Misc"      # Unspecified objects
+    - "Tram"      # Not relevant for Road-Sense project (1.26% of data)
+  
+  min_bbox_size: 0.005  # Minimum area (0.5% of image) to keep a bbox, helps reduce noise
+
+# Dataset splitting
+split:
+  train_ratio: 0.7   # 5,237 images
+  val_ratio: 0.2     # 1,496 images
+  test_ratio: 0.1    # 748 images
+  random_seed: 42    # For reproducibility
+  shuffle: true      # Randomize before splitting
+
+# Processing options
+processing:
+  skip_on_error: true   # Continue if an image/label pair fails
+  show_progress: true   # Display tqdm progress bar
+  verify_output: true   # Validate YOLO labels after conversion
+
+# YOLO data.yaml configuration (auto-generated)
+yolo_config:
+  names:
+    0: "Vehicle"      # Car, Van, Truck combined
+    1: "Pedestrian"   # Pedestrian, Person_sitting combined
+    2: "Cyclist"
+  nc: 3  # Number of classes for Stage 1 (KITTI only)
+  
+# Expected output structure:
+# data/processed/kitti/
+#   ├── images/
+#   │   ├── train/  (5,237 images)
+#   │   ├── val/    (1,496 images)
+#   │   └── test/   (748 images)
+#   ├── labels/
+#   │   ├── train/  (YOLO format .txt)
+#   │   ├── val/
+#   │   └── test/
+#   └── data.yaml   (YOLO training config)
