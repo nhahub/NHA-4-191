@@ -1,0 +1,5 @@
+model,family,params_m,model_size_mb,device,imgsz,num_images,map50,map5095,latency_ms,fps,cpu_mem_delta_mb,gpu_mem_peak_mb
+fasterrcnn_resnet50_fpn_v2,fasterrcnn,43.712,167.11,cuda:0,640,12,0.9362,0.7748,216.49,4.62,237.09,772.24
+yolo11m.pt,yolo,20.115,38.8,cuda:0,640,12,0.8564,0.7598,28.24,35.41,41.11,227.65
+yolov8s.pt,yolo,11.167,21.54,cuda:0,640,12,0.8778,0.7479,15.12,66.15,735.84,78.6
+ssd300_vgg16,ssd,35.642,135.99,cuda:0,640,12,0.6997,0.5034,38.7,25.84,176.37,362.25
