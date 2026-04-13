@@ -1,0 +1,10 @@
+class,count
+Car,28742
+DontCare,11295
+Pedestrian,4487
+Van,2914
+Cyclist,1627
+Truck,1094
+Misc,973
+Tram,511
+Person_sitting,222

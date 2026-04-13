@@ -1,3 +1,11 @@
+# ====================================
+# Road-Sense .gitignore
+# Real-Time Object Detection for Autonomous Vehicles
+# ====================================
+
+# =====================================
+# Environment Variables
+# =====================================
 .env
 .env.local
 .env.development.local
@@ -5,35 +13,123 @@
 .env.production.local
 *.env
 
+# =====================================
+# Python Cache and Bytecode
+# =====================================
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.py[cod]
+*$py.class
 *.sqlite3
+.pytest_cache/
+*.egg-info/
+dist/
+build/
 
+# =====================================
+# Virtual Environments
+# =====================================
 venv/
 env/
 .venv/
+ENV/
+.virtualenv/
 
+# =====================================
+# Model Checkpoints (Except Best/Final)
+# =====================================
 *.h5
 *.pt
 *.pth
 *.onnx
 *.ckpt
+!models/checkpoints/*.pt
+!models/checkpoints/**/*.pt
 
+# =====================================
+# IDE and Editor Files
+# =====================================
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
+.DS_Store
+Thumbs.db
 
+# =====================================
+# Archives (Raw Downloads)
+# =====================================
 *.zip
 *.rar
 *.7z
 *.xz
 *.tar
 *.gz
+*.bz2
 
-data/* 
+# =====================================
+# Raw Datasets (DO NOT COMMIT - 12+ GB)
+# =====================================
+data/raw/KITTI/training/image_2/*.png
+data/raw/KITTI/training/label_2/*.txt
+data/raw/KITTI/testing/
+data/raw/GTSDB/
+data/raw/COCO/
+data/raw/*/
+
+# =====================================
+# Processed Datasets (DO NOT COMMIT - 500+ MB)
+# =====================================
+data/processed/*/images/**/*.jpg
+data/processed/*/images/**/*.png
+data/processed/*/labels/**/*.txt
+data/processed/kitti/images/
+data/processed/kitti/labels/
+
+# =====================================
+# Augmented Data (DO NOT COMMIT)
+# =====================================
+data/augmented/
+
+# =====================================
+# Training Artifacts (DO NOT COMMIT)
+# =====================================
+runs/
+wandb/
+lightning_logs/
+mlruns/
+.tensorboard/
+outputs/
+
+# =====================================
+# Logs and Temporary Files
+# =====================================
+*.log
+*.tmp
+*.cache
+logs/
+.ipynb_checkpoints/
+
+# =====================================
+# Keep Directory Structure (Empty Dirs)
+# =====================================
 !data/.gitkeep
-*.toml
+!data/raw/.gitkeep
+!data/raw/KITTI/.gitkeep
+!data/processed/.gitkeep
+!data/processed/kitti/.gitkeep
+!data/augmented/.gitkeep
+!models/.gitkeep
+!models/checkpoints/.gitkeep
+
+# =====================================
+# ALLOWED: Sample Files (5-10 samples)
+# =====================================
+!data/samples/
+!data/samples/**/*.png
+!data/samples/**/*.txt
+!data/samples/**/*.jpg
 

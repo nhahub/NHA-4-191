@@ -46,6 +46,37 @@ def get_class_mapping(config: Dict) -> Dict[str, int]:
     return config['label_conversion']['class_mapping']
 
 
+def get_yolo_class_names(config: Dict) -> List[str]:
+    yolo_names_cfg = config.get('yolo_config', {}).get('names')
+
+    if yolo_names_cfg:
+        names_by_id = {}
+        for class_id, class_name in yolo_names_cfg.items():
+            try:
+                idx = int(class_id)
+            except (TypeError, ValueError) as exc:
+                raise ValueError(f"Invalid yolo_config class id: {class_id}") from exc
+            names_by_id[idx] = str(class_name)
+    else:
+        class_mapping = get_class_mapping(config)
+        names_by_id = {}
+        for raw_name, class_id in class_mapping.items():
+            # Keep first class name encountered for each merged target id.
+            names_by_id.setdefault(class_id, raw_name)
+
+    if not names_by_id:
+        raise ValueError("No classes found for YOLO config generation")
+
+    sorted_ids = sorted(names_by_id.keys())
+    expected_ids = list(range(len(sorted_ids)))
+    if sorted_ids != expected_ids:
+        raise ValueError(
+            f"Class ids must be contiguous starting at 0, got: {sorted_ids}"
+        )
+
+    return [names_by_id[class_id] for class_id in sorted_ids]
+
+
 def filter_classes(
     class_names: List[str],
     class_labels: List[int],
@@ -344,11 +375,8 @@ def create_yolo_config(
     project_root: Path
 ) -> None:
     data_yaml_path = processed_dir / "data.yaml"
-    
-    class_mapping = get_class_mapping(config)
-    # Sort by class ID
-    sorted_classes = sorted(class_mapping.items(), key=lambda x: x[1])
-    class_names = [name for name, _ in sorted_classes]
+
+    class_names = get_yolo_class_names(config)
     
     # Create relative paths from project root
     train_path = processed_dir / "images" / "train"

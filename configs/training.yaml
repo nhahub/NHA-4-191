@@ -1,0 +1,120 @@
+# Training Configuration for Road-Sense YOLOv11 Model
+# Used by src/models/trainer.py and train.py
+
+# ==============================================================================
+# MODEL CONFIGURATION
+# ==============================================================================
+model:
+  name: "yolo11m"              # Model variant: yolo11n, yolo11s, yolo11m, yolo11l, yolo11x
+  pretrained: true              # Use COCO pre-trained weights
+  pretrained_weights: null      # Custom weights path (null = auto-download COCO weights)
+
+# ==============================================================================
+# DATA CONFIGURATION
+# ==============================================================================
+data:
+  yaml_path: "data/processed/kitti/data.yaml"  # YOLO dataset config
+  imgsz: 640                    # Input image size
+  batch_size: 16                # Batch size (adjust based on GPU memory)
+  workers: 4                    # DataLoader workers
+  pin_memory: true              # Pin memory for faster GPU transfer
+
+# ==============================================================================
+# TRAINING HYPERPARAMETERS
+# ==============================================================================
+training:
+  epochs: 100                   # Number of training epochs
+  patience: 30                  # Early stopping patience (epochs without improvement)
+  optimizer: "auto"             # auto, SGD, Adam, AdamW
+  lr0: 0.01                     # Initial learning rate
+  lrf: 0.01                     # Final learning rate (lr0 * lrf)
+  momentum: 0.937               # SGD momentum / Adam beta1
+  weight_decay: 0.0005          # Weight decay
+  warmup_epochs: 3.0            # Learning rate warmup period
+  warmup_momentum: 0.8          # Initial momentum during warmup
+  warmup_bias_lr: 0.1           # Initial bias learning rate during warmup
+
+# ==============================================================================
+# AUGMENTATION HYPERPARAMETERS
+# ==============================================================================
+augmentation:
+  hsv_h: 0.015                  # HSV hue augmentation fraction
+  hsv_s: 0.7                    # HSV saturation augmentation fraction
+  hsv_v: 0.4                    # HSV value augmentation fraction
+  degrees: 0.0                  # Image rotation degrees
+  translate: 0.1                # Image translation fraction
+  scale: 0.5                    # Image scale fraction
+  shear: 0.0                    # Image shear degrees
+  perspective: 0.0              # Image perspective fraction
+  flipud: 0.0                   # Vertical flip probability
+  fliplr: 0.5                   # Horizontal flip probability
+  mosaic: 1.0                   # Mosaic augmentation fraction
+  mixup: 0.0                    # MixUp augmentation fraction
+  copy_paste: 0.0               # Copy-paste augmentation fraction
+
+# ==============================================================================
+# REGULARIZATION
+# ==============================================================================
+regularization:
+  dropout: 0.0                  # Dropout fraction
+  box: 7.5                      # Box loss weight
+  cls: 0.5                      # Classification loss weight (increase for minority classes)
+  dfl: 1.5                      # Distribution Focal Loss weight
+
+# ==============================================================================
+# VALIDATION
+# ==============================================================================
+validation:
+  val_interval: 1               # Run validation every N epochs
+
+# ==============================================================================
+# CHECKPOINTING
+# ==============================================================================
+checkpoint:
+  save_dir: "models/checkpoints"
+  save_best: true               # Save best model based on metric
+  save_last: true               # Save last checkpoint
+  save_period: -1               # Save checkpoint every N epochs (-1 = disabled)
+  metric: "mAP50-95"            # Metric for best model selection: mAP50, mAP50-95, fitness
+
+# ==============================================================================
+# LOGGING & MONITORING
+# ==============================================================================
+logging:
+  project: "runs/train"         # Project directory for outputs
+  name: "exp"                   # Experiment name (auto-incremented: exp, exp2, ...)
+  exist_ok: false               # Overwrite existing experiment directory
+  verbose: true                 # Print verbose output
+
+  # Weights & Biases (optional)
+  wandb:
+    enabled: false
+    project: "road-sense"
+    entity: null                # Your W&B username/org
+    name: null                  # Run name (null = auto-generated)
+    tags: ["kitti", "yolo11m"]
+
+  # TensorBoard (optional)
+  tensorboard:
+    enabled: false
+    log_dir: "runs/tensorboard"
+
+# ==============================================================================
+# DEVICE CONFIGURATION
+# ==============================================================================
+device:
+  device: "0"                   # cuda device(s): 0, 0,1,2,3 or cpu
+  deterministic: true           # Enable deterministic algorithms
+  half_precision: false         # Use FP16 mixed precision training
+  compile: false                # Use torch.compile (PyTorch 2.0+)
+
+# ==============================================================================
+# ADVANCED
+# ==============================================================================
+advanced:
+  close_mosaic: 10              # Disable mosaic augmentation for last N epochs
+  freeze: []                    # Layers to freeze (e.g., [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+  rect: false                   # Rectangular training
+  resume: false                 # Resume training from last checkpoint
+  cache: false                  # Cache images for faster loading (ram/disk/false)
+  seed: 42                      # Random seed for reproducibility
