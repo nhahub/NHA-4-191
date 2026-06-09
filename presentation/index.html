@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Road-Sense Showcase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <nav class="top-nav reveal">
+    <div class="nav-container">
+      <div class="brand">ROAD-SENSE</div>
+      <button id="menuToggle" class="menu-toggle" aria-label="Toggle menu">Menu</button>
+      <ul id="menu" class="menu">
+        <li><a href="index.html" class="active">Home</a></li>
+        <li><a href="docs.html">Docs</a></li>
+        <li><a href="reports.html">Reports</a></li>
+        <li><a href="visuals.html">Visuals</a></li>
+        <li><a href="detect.html">Detect</a></li>
+        <li><a href="#results">Results</a></li>
+        <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">☀️</button>
+      </ul>
+    </div>
+  </nav>
+
+  <main>
+    <header class="hero reveal">
+      <div class="hero-content">
+        <p class="eyebrow">Autonomous Vision Project Showcase</p>
+        <h1>From Raw KITTI Data to Production-Ready Detection Insights</h1>
+        <p class="hero-copy">
+          A presentation-ready portal for Road-Sense documentation, milestone reports,
+          training visualizations, and benchmark results.
+        </p>
+        <div class="hero-actions">
+          <a href="#results" class="btn btn-primary">View Metrics</a>
+          <a href="docs.html" class="btn btn-ghost">Open Documentation</a>
+        </div>
+      </div>
+
+      <section class="stat-ribbon reveal" aria-label="Key model metrics">
+        <article>
+          <span class="label">Best mAP50-95</span>
+          <span class="value">0.76786</span>
+        </article>
+        <article>
+          <span class="label">Best mAP50</span>
+          <span class="value">0.94159</span>
+        </article>
+        <article>
+          <span class="label">Best Precision</span>
+          <span class="value">0.92421</span>
+        </article>
+        <article>
+          <span class="label">Best Recall</span>
+          <span class="value">0.91550</span>
+        </article>
+      </section>
+    </header>
+
+    <section id="results" class="panel reveal">
+      <div class="panel-head">
+        <p class="eyebrow">Run exp34332</p>
+        <h2>Results Snapshot</h2>
+      </div>
+
+      <div class="results-wrap">
+        <div class="score-cards" id="scoreCards"></div>
+
+        <div class="chart-card">
+          <h3>Best vs Final Epoch</h3>
+          <canvas id="metricChart" width="700" height="320" aria-label="Best versus final metrics chart"></canvas>
+          <p class="caption">Best validation scores stayed close to the final epoch, indicating stable convergence.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer reveal">
+    <p>Road-Sense Presentation Site</p>
+    <p>Built for docs, reports, visual artifacts, and milestone communication.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

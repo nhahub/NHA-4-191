@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Road-Sense Live Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .detect-intro {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+      color: var(--muted);
+      background: linear-gradient(135deg, rgba(129, 140, 248, 0.1), rgba(15, 23, 42, 0.35));
+      margin-bottom: 20px;
+      font-size: 0.94rem;
+    }
+
+    .api-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      border: 1px solid var(--line);
+    }
+
+    .api-status.connected {
+      color: #3dd68c;
+      background: rgba(61, 214, 140, 0.1);
+      border-color: rgba(61, 214, 140, 0.4);
+    }
+
+    .api-status.disconnected {
+      color: #ff7f7f;
+      background: rgba(255, 127, 127, 0.1);
+      border-color: rgba(255, 127, 127, 0.4);
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08);
+    }
+
+    .control-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .control-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .control-card h3 {
+      margin: 0 0 8px;
+      font-size: 1.02rem;
+      font-weight: 800;
+    }
+
+    .control-card p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.55;
+    }
+
+    .control-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .sample-control {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      background: var(--surface-hover);
+      margin-bottom: 16px;
+    }
+
+    .sample-control label {
+      display: block;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.8rem;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .sample-control input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .range-values {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .feed-card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #02040a;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .feed-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #dbe7ff;
+      background: rgba(19, 25, 41, 0.88);
+    }
+
+    .feed-head span:last-child {
+      color: #9ab2dd;
+      font-weight: 600;
+    }
+
+    .feed-frame {
+      aspect-ratio: 16 / 9;
+      width: 100%;
+      display: grid;
+      place-items: center;
+      color: #64748b;
+      font-size: 0.9rem;
+      position: relative;
+    }
+
+    .feed-frame video,
+    .feed-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      background: #000;
+    }
+
+    .feed-placeholder {
+      text-align: center;
+      padding: 14px;
+      color: #5f6e85;
+      font-size: 0.88rem;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .stat-item {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      background: var(--surface);
+    }
+
+    .stat-label {
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 1.03rem;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .det-list {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface);
+      padding: 12px;
+    }
+
+    .det-list h3 {
+      margin: 0 0 10px;
+      font-size: 0.95rem;
+    }
+
+    .det-items {
+      display: grid;
+      gap: 8px;
+      max-height: 220px;
+      overflow: auto;
+    }
+
+    .det-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+      background: var(--surface-hover);
+      font-size: 0.87rem;
+    }
+
+    .det-class {
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .det-class.Vehicle {
+      color: #3dd68c;
+    }
+
+    .det-class.Pedestrian {
+      color: #63a3ff;
+    }
+
+    .det-class.Cyclist {
+      color: #ff7a8e;
+    }
+
+    .det-confidence {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .status-bar {
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: var(--surface-hover);
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .status-bar.error {
+      border-color: rgba(255, 127, 127, 0.55);
+      background: rgba(255, 127, 127, 0.08);
+      color: #ff7f7f;
+    }
+
+    .btn-danger {
+      border: 1px solid rgba(255, 127, 127, 0.48);
+      background: rgba(255, 127, 127, 0.16);
+      color: #ffd8d8;
+    }
+
+    .btn-danger:hover {
+      background: rgba(255, 127, 127, 0.25);
+      border-color: rgba(255, 127, 127, 0.65);
+    }
+
+    .btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    @media (max-width: 1000px) {
+      .control-grid,
+      .preview-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="top-nav reveal">
+    <div class="nav-container">
+      <div class="brand">ROAD-SENSE</div>
+      <button id="menuToggle" class="menu-toggle" aria-label="Toggle menu">Menu</button>
+      <ul id="menu" class="menu">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="docs.html">Docs</a></li>
+        <li><a href="reports.html">Reports</a></li>
+        <li><a href="visuals.html">Visuals</a></li>
+        <li><a href="detect.html" class="active">Detect</a></li>
+        <li><a href="index.html#results">Results</a></li>
+        <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">☀️</button>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="reveal">
+    <section class="panel" style="margin-top: 3rem;">
+      <div class="panel-head">
+        <p class="eyebrow">Interactive Demo</p>
+        <h2>Live Camera + Video Realtime Analysis</h2>
+      </div>
+
+      <p class="detect-intro">
+        This demo supports two realtime modes: open your camera for live detection, or upload any video and process it frame by frame in the UI.
+        Start your API first: python3 src/models/api_server.py
+      </p>
+
+      <div id="apiStatus" class="api-status disconnected">
+        <span class="status-dot"></span>
+        <span id="apiStatusText">Checking API connection...</span>
+      </div>
+
+      <div class="sample-control">
+        <label for="samplingRate">Frame Sampling Rate</label>
+        <input id="samplingRate" type="range" min="30" max="500" step="10" value="70" />
+        <div class="range-values">
+          <span>Fast</span>
+          <span id="samplingRateValue">70 ms</span>
+          <span>Stable</span>
+        </div>
+      </div>
+
+      <div class="control-grid">
+        <article class="control-card">
+          <h3>Mode 1: Open Camera</h3>
+          <p>Use your webcam for the live demo. The UI sends sampled frames to your Road-Sense model and updates the result panel in realtime.</p>
+          <div class="control-row">
+            <button id="startCameraBtn" class="btn btn-primary">Start Camera Demo</button>
+            <button id="stopCameraBtn" class="btn btn-danger" disabled>Stop</button>
+          </div>
+        </article>
+
+        <article class="control-card">
+          <h3>Mode 2: Upload Video</h3>
+          <p>Upload an mp4, mov, or webm clip and run realtime frame analysis while the video is playing inside the presentation UI.</p>
+          <div class="control-row">
+            <label for="videoInput" class="btn btn-ghost">Choose Video</label>
+            <input id="videoInput" class="file-input" type="file" accept="video/mp4,video/webm,video/ogg,video/quicktime" />
+            <button id="startVideoBtn" class="btn btn-primary" disabled>Analyze Video</button>
+            <button id="stopVideoBtn" class="btn btn-danger" disabled>Stop</button>
+          </div>
+          <div id="selectedVideoName" class="range-values">
+            <span>No video selected</span>
+            <span></span>
+          </div>
+        </article>
+      </div>
+
+      <div class="preview-grid">
+        <article class="feed-card">
+          <div class="feed-head">
+            <span>Source Feed</span>
+            <span id="sourceFeedState">Idle</span>
+          </div>
+          <div class="feed-frame">
+            <video id="sourceVideo" class="hidden" autoplay muted playsinline controls></video>
+            <p id="sourcePlaceholder" class="feed-placeholder">Start camera or load a video to begin.</p>
+          </div>
+        </article>
+
+        <article class="feed-card">
+          <div class="feed-head">
+            <span>Analyzed Output</span>
+            <span id="outputFeedState">Waiting</span>
+          </div>
+          <div class="feed-frame">
+            <img id="annotatedImage" class="hidden" alt="Analyzed frame" />
+            <p id="outputPlaceholder" class="feed-placeholder">Annotated frames will appear here.</p>
+          </div>
+        </article>
+      </div>
+
+      <div class="stats-grid">
+        <article class="stat-item">
+          <div class="stat-label">Mode</div>
+          <div id="modeValue" class="stat-value">Idle</div>
+        </article>
+        <article class="stat-item">
+          <div class="stat-label">Frames Processed</div>
+          <div id="framesValue" class="stat-value">0</div>
+        </article>
+        <article class="stat-item">
+          <div class="stat-label">Inference Time</div>
+          <div id="inferenceValue" class="stat-value">- ms</div>
+        </article>
+        <article class="stat-item">
+          <div class="stat-label">Estimated FPS</div>
+          <div id="fpsValue" class="stat-value">0.0</div>
+        </article>
+      </div>
+
+      <section class="det-list" aria-live="polite">
+        <h3>Latest Detections</h3>
+        <div id="detectionsList" class="det-items">
+          <p class="feed-placeholder">No detections yet.</p>
+        </div>
+      </section>
+
+      <div id="statusBar" class="status-bar">Ready. Connect to API and start a mode.</div>
+    </section>
+  </main>
+
+  <footer class="footer reveal">
+    <p>Road-Sense Presentation Site</p>
+    <p>Realtime demo powered by FastAPI and YOLO inference.</p>
+  </footer>
+
+  <script>
+    const API_URL = "http://localhost:8000";
+    const DETECT_ENDPOINT = API_URL + "/detect";
+    const HEALTH_ENDPOINT = API_URL + "/health";
+
+    const apiStatus = document.getElementById("apiStatus");
+    const apiStatusText = document.getElementById("apiStatusText");
+    const samplingRate = document.getElementById("samplingRate");
+    const samplingRateValue = document.getElementById("samplingRateValue");
+
+    const startCameraBtn = document.getElementById("startCameraBtn");
+    const stopCameraBtn = document.getElementById("stopCameraBtn");
+    const videoInput = document.getElementById("videoInput");
+    const startVideoBtn = document.getElementById("startVideoBtn");
+    const stopVideoBtn = document.getElementById("stopVideoBtn");
+    const selectedVideoName = document.getElementById("selectedVideoName");
+
+    const sourceVideo = document.getElementById("sourceVideo");
+    const sourcePlaceholder = document.getElementById("sourcePlaceholder");
+    const annotatedImage = document.getElementById("annotatedImage");
+    const outputPlaceholder = document.getElementById("outputPlaceholder");
+
+    const sourceFeedState = document.getElementById("sourceFeedState");
+    const outputFeedState = document.getElementById("outputFeedState");
+    const modeValue = document.getElementById("modeValue");
+    const framesValue = document.getElementById("framesValue");
+    const inferenceValue = document.getElementById("inferenceValue");
+    const fpsValue = document.getElementById("fpsValue");
+    const detectionsList = document.getElementById("detectionsList");
+    const statusBar = document.getElementById("statusBar");
+
+    const captureCanvas = document.createElement("canvas");
+    const captureCtx = captureCanvas.getContext("2d");
+    const TARGET_MAX_EDGE = 640;
+    const JPEG_QUALITY = 0.7;
+
+    let apiConnected = false;
+    let currentMode = "idle";
+    let cameraStream = null;
+    let frameTimer = null;
+    let frameLoopRunning = false;
+    let activeRequestController = null;
+    let processingFrame = false;
+    let uploadedVideoURL = null;
+    let currentSessionId = null;
+
+    let framesProcessed = 0;
+    let sessionStart = 0;
+
+    function createSessionId(modeName) {
+      return modeName + "-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
+    }
+
+    function setStatus(message, isError = false) {
+      statusBar.textContent = message;
+      statusBar.classList.toggle("error", isError);
+    }
+
+    async function checkAPI() {
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 2000);
+        const response = await fetch(HEALTH_ENDPOINT, { signal: controller.signal });
+        clearTimeout(timeout);
+        apiConnected = response.ok;
+      } catch (error) {
+        apiConnected = false;
+      }
+
+      if (apiConnected) {
+        apiStatus.className = "api-status connected";
+        apiStatusText.textContent = "API connected at " + API_URL;
+      } else {
+        apiStatus.className = "api-status disconnected";
+        apiStatusText.textContent = "API offline. Start server before running demo.";
+      }
+    }
+
+    function updateSamplingLabel() {
+      samplingRateValue.textContent = samplingRate.value + " ms";
+    }
+
+    function updateStats(inferenceMs = null) {
+      modeValue.textContent = currentMode.charAt(0).toUpperCase() + currentMode.slice(1);
+      framesValue.textContent = String(framesProcessed);
+
+      if (inferenceMs !== null) {
+        inferenceValue.textContent = inferenceMs.toFixed(1) + " ms";
+      }
+
+      if (sessionStart > 0 && framesProcessed > 0) {
+        const elapsedSec = (Date.now() - sessionStart) / 1000;
+        const fps = elapsedSec > 0 ? framesProcessed / elapsedSec : 0;
+        fpsValue.textContent = fps.toFixed(1);
+      } else {
+        fpsValue.textContent = "0.0";
+      }
+    }
+
+    function setFeedState(sourceText, outputText) {
+      sourceFeedState.textContent = sourceText;
+      outputFeedState.textContent = outputText;
+    }
+
+    function resetDetections() {
+      detectionsList.innerHTML = '<p class="feed-placeholder">No detections yet.</p>';
+    }
+
+    function renderDetections(detections) {
+      if (!detections || detections.length === 0) {
+        detectionsList.innerHTML = '<p class="feed-placeholder">No objects detected in latest frame.</p>';
+        return;
+      }
+
+      detectionsList.innerHTML = "";
+      detections.forEach((det) => {
+        const row = document.createElement("div");
+        row.className = "det-item";
+        const classLabel = det.track_id !== null && det.track_id !== undefined
+          ? det.class_name + " #" + det.track_id
+          : det.class_name;
+        row.innerHTML =
+          '<span class="det-class ' + det.class_name + '">' + classLabel + '</span>' +
+          '<span class="det-confidence">' + (det.confidence * 100).toFixed(1) + "%</span>";
+        detectionsList.appendChild(row);
+      });
+    }
+
+    function showSourceVideo() {
+      sourceVideo.classList.remove("hidden");
+      sourcePlaceholder.classList.add("hidden");
+    }
+
+    function hideSourceVideo() {
+      sourceVideo.classList.add("hidden");
+      sourcePlaceholder.classList.remove("hidden");
+    }
+
+    function showAnnotatedImage() {
+      annotatedImage.classList.remove("hidden");
+      outputPlaceholder.classList.add("hidden");
+    }
+
+    function hideAnnotatedImage() {
+      annotatedImage.classList.add("hidden");
+      outputPlaceholder.classList.remove("hidden");
+    }
+
+    function stopFrameLoop() {
+      frameLoopRunning = false;
+      if (frameTimer) {
+        clearTimeout(frameTimer);
+        frameTimer = null;
+      }
+      if (activeRequestController) {
+        activeRequestController.abort();
+        activeRequestController = null;
+      }
+      processingFrame = false;
+    }
+
+    function stopCameraTracks() {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach((track) => track.stop());
+        cameraStream = null;
+      }
+    }
+
+    function stopSession(silent = false) {
+      stopFrameLoop();
+      stopCameraTracks();
+
+      sourceVideo.pause();
+      sourceVideo.srcObject = null;
+
+      if (currentMode === "video" && uploadedVideoURL) {
+        sourceVideo.src = uploadedVideoURL;
+      } else {
+        sourceVideo.removeAttribute("src");
+      }
+
+      currentMode = "idle";
+      currentSessionId = null;
+      startCameraBtn.disabled = false;
+      stopCameraBtn.disabled = true;
+      startVideoBtn.disabled = videoInput.files.length === 0;
+      stopVideoBtn.disabled = true;
+      setFeedState("Idle", "Waiting");
+      modeValue.textContent = "Idle";
+
+      if (!silent) {
+        setStatus("Demo stopped.");
+      }
+    }
+
+    async function detectCurrentFrame() {
+      if (processingFrame || !apiConnected || sourceVideo.readyState < 2) {
+        return;
+      }
+
+      if (currentMode === "video" && sourceVideo.ended) {
+        stopSession(true);
+        setStatus("Video finished. Choose Analyze Video to replay.");
+        return;
+      }
+
+      processingFrame = true;
+
+      try {
+        const sourceWidth = sourceVideo.videoWidth || 640;
+        const sourceHeight = sourceVideo.videoHeight || 360;
+        const scale = Math.min(1, TARGET_MAX_EDGE / Math.max(sourceWidth, sourceHeight));
+        const width = Math.max(1, Math.round(sourceWidth * scale));
+        const height = Math.max(1, Math.round(sourceHeight * scale));
+        captureCanvas.width = width;
+        captureCanvas.height = height;
+        captureCtx.drawImage(sourceVideo, 0, 0, width, height);
+
+        const blob = await new Promise((resolve) => {
+          captureCanvas.toBlob(resolve, "image/jpeg", JPEG_QUALITY);
+        });
+
+        if (!blob) {
+          throw new Error("Could not capture frame.");
+        }
+
+        const formData = new FormData();
+        formData.append("image", blob, "frame.jpg");
+        formData.append("session_id", currentSessionId || "default");
+
+        activeRequestController = new AbortController();
+        const response = await fetch(DETECT_ENDPOINT, {
+          method: "POST",
+          body: formData,
+          signal: activeRequestController.signal
+        });
+
+        let data = null;
+        try {
+          data = await response.json();
+        } catch (error) {
+          data = null;
+        }
+
+        if (!response.ok) {
+          const detail = data && data.detail ? data.detail : "Detection request failed.";
+          throw new Error(detail);
+        }
+
+        if (data && data.annotated_image) {
+          annotatedImage.src = data.annotated_image;
+          showAnnotatedImage();
+        }
+
+        framesProcessed += 1;
+        updateStats(data && data.inference_time_ms ? data.inference_time_ms : null);
+        renderDetections(data ? data.detections : []);
+        setFeedState(
+          currentMode === "camera" ? "Live Camera" : "Uploaded Video",
+          "Realtime"
+        );
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          setStatus("Detection error: " + error.message, true);
+          setFeedState("Error", "Error");
+        }
+      } finally {
+        activeRequestController = null;
+        processingFrame = false;
+      }
+    }
+
+    async function frameLoopTick() {
+      if (!frameLoopRunning) {
+        return;
+      }
+
+      await detectCurrentFrame();
+
+      if (!frameLoopRunning) {
+        return;
+      }
+
+      const intervalMs = Number(samplingRate.value);
+      frameTimer = setTimeout(frameLoopTick, intervalMs);
+    }
+
+    function startFrameLoop() {
+      stopFrameLoop();
+      frameLoopRunning = true;
+      frameLoopTick();
+    }
+
+    function resetSessionMetrics(modeName) {
+      currentMode = modeName;
+      currentSessionId = createSessionId(modeName);
+      framesProcessed = 0;
+      sessionStart = Date.now();
+      inferenceValue.textContent = "- ms";
+      fpsValue.textContent = "0.0";
+      resetDetections();
+      updateStats();
+    }
+
+    async function startCameraDemo() {
+      if (!apiConnected) {
+        setStatus("API is offline. Start the server, then try camera demo.", true);
+        return;
+      }
+
+      try {
+        stopSession(true);
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "environment" },
+          audio: false
+        });
+
+        sourceVideo.srcObject = cameraStream;
+        sourceVideo.muted = true;
+        sourceVideo.controls = false;
+        await sourceVideo.play();
+
+        showSourceVideo();
+        showAnnotatedImage();
+
+        resetSessionMetrics("camera");
+        startCameraBtn.disabled = true;
+        stopCameraBtn.disabled = false;
+        startVideoBtn.disabled = true;
+        stopVideoBtn.disabled = true;
+
+        setFeedState("Live Camera", "Analyzing");
+        setStatus("Camera started. Running realtime detection with tracking.");
+        startFrameLoop();
+      } catch (error) {
+        setStatus("Could not access camera: " + error.message, true);
+        stopSession(true);
+        hideSourceVideo();
+      }
+    }
+
+    async function startVideoDemo() {
+      if (!apiConnected) {
+        setStatus("API is offline. Start the server, then analyze video.", true);
+        return;
+      }
+
+      if (!videoInput.files || videoInput.files.length === 0) {
+        setStatus("Choose a video file first.", true);
+        return;
+      }
+
+      try {
+        stopSession(true);
+
+        const file = videoInput.files[0];
+        if (uploadedVideoURL) {
+          URL.revokeObjectURL(uploadedVideoURL);
+        }
+        uploadedVideoURL = URL.createObjectURL(file);
+
+        sourceVideo.src = uploadedVideoURL;
+        sourceVideo.srcObject = null;
+        sourceVideo.muted = true;
+        sourceVideo.controls = true;
+        sourceVideo.currentTime = 0;
+
+        await sourceVideo.play();
+        showSourceVideo();
+        showAnnotatedImage();
+
+        resetSessionMetrics("video");
+        startCameraBtn.disabled = true;
+        stopCameraBtn.disabled = true;
+        startVideoBtn.disabled = true;
+        stopVideoBtn.disabled = false;
+
+        setFeedState("Uploaded Video", "Analyzing");
+        setStatus("Video analysis started. Tracking enabled.");
+        startFrameLoop();
+      } catch (error) {
+        setStatus("Could not start video analysis: " + error.message, true);
+        stopSession(true);
+      }
+    }
+
+    function handleVideoSelected() {
+      if (!videoInput.files || videoInput.files.length === 0) {
+        selectedVideoName.innerHTML = "<span>No video selected</span><span></span>";
+        startVideoBtn.disabled = true;
+        return;
+      }
+
+      const file = videoInput.files[0];
+      const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+      selectedVideoName.innerHTML = "<span>" + file.name + "</span><span>" + sizeMb + " MB</span>";
+      startVideoBtn.disabled = false;
+      setStatus("Video selected. Click Analyze Video to start.");
+    }
+
+    function initMenu() {
+      const menuToggle = document.getElementById("menuToggle");
+      const menu = document.getElementById("menu");
+      if (!menuToggle || !menu) {
+        return;
+      }
+
+      menuToggle.addEventListener("click", () => {
+        menu.classList.toggle("open");
+      });
+
+      menu.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", () => {
+          menu.classList.remove("open");
+        });
+      });
+    }
+
+    function initThemeToggle() {
+      const themeToggle = document.getElementById("themeToggle");
+      if (!themeToggle) {
+        return;
+      }
+
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme === "light") {
+        document.body.classList.add("light-mode");
+      }
+
+      const applyThemeLabel = () => {
+        themeToggle.textContent = document.body.classList.contains("light-mode") ? "Moon" : "Sun";
+      };
+
+      applyThemeLabel();
+
+      themeToggle.addEventListener("click", () => {
+        document.body.classList.toggle("light-mode");
+        localStorage.setItem("theme", document.body.classList.contains("light-mode") ? "light" : "night");
+        applyThemeLabel();
+      });
+    }
+
+    function initReveal() {
+      const items = document.querySelectorAll(".reveal");
+      if (!items.length || !window.IntersectionObserver) {
+        return;
+      }
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("in");
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.15 }
+      );
+
+      items.forEach((item, index) => {
+        item.style.transitionDelay = (index * 70) + "ms";
+        observer.observe(item);
+      });
+    }
+
+    function initEvents() {
+      samplingRate.addEventListener("input", () => {
+        updateSamplingLabel();
+        if (currentMode !== "idle") {
+          startFrameLoop();
+        }
+      });
+
+      startCameraBtn.addEventListener("click", startCameraDemo);
+      stopCameraBtn.addEventListener("click", () => {
+        stopSession();
+        hideSourceVideo();
+      });
+
+      videoInput.addEventListener("change", handleVideoSelected);
+      startVideoBtn.addEventListener("click", startVideoDemo);
+      stopVideoBtn.addEventListener("click", () => {
+        stopSession();
+      });
+
+      sourceVideo.addEventListener("ended", () => {
+        if (currentMode === "video") {
+          stopSession(true);
+          setStatus("Video ended. Choose Analyze Video to replay.");
+        }
+      });
+
+      window.addEventListener("beforeunload", () => {
+        stopSession(true);
+        if (uploadedVideoURL) {
+          URL.revokeObjectURL(uploadedVideoURL);
+        }
+      });
+    }
+
+    async function init() {
+      initMenu();
+      initThemeToggle();
+      initReveal();
+      initEvents();
+      updateSamplingLabel();
+      hideSourceVideo();
+      hideAnnotatedImage();
+      updateStats();
+      await checkAPI();
+      setInterval(checkAPI, 5000);
+    }
+
+    init();
+  </script>
+</body>
+</html>

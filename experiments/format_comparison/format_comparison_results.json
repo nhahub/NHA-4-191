@@ -1,0 +1,46 @@
+{
+  "results": [
+    {
+      "Format": "pt",
+      "Model Path": "/home/abdallah/Coding/DEPI-Project/Road-Sense/models/exports/best-3classes-exp34332-original.pt",
+      "Model Size (MB)": 38.65,
+      "mAP@50": 0.9867,
+      "mAP@50-95": 0.9867,
+      "Precision": 0.875,
+      "Recall": 0.9852,
+      "Latency (ms)": 37.07,
+      "FPS": 26.97,
+      "Error": ""
+    },
+    {
+      "Format": "onnx",
+      "Model Path": "/home/abdallah/Coding/DEPI-Project/Road-Sense/models/exports/best-3classes-exp34332.onnx",
+      "Model Size (MB)": 38.32,
+      "mAP@50": 0.9867,
+      "mAP@50-95": 0.9867,
+      "Precision": 0.875,
+      "Recall": 0.9852,
+      "Latency (ms)": 369.59,
+      "FPS": 2.71,
+      "Error": ""
+    },
+    {
+      "Format": "torchscript",
+      "Model Path": "/home/abdallah/Coding/DEPI-Project/Road-Sense/models/exports/best-3classes-exp34332.torchscript",
+      "Model Size (MB)": 77.08,
+      "mAP@50": 0.9867,
+      "mAP@50-95": 0.9867,
+      "Precision": 0.875,
+      "Recall": 0.9852,
+      "Latency (ms)": 37.25,
+      "FPS": 26.84,
+      "Error": ""
+    }
+  ],
+  "settings": {
+    "image_size": 640,
+    "num_images": 50,
+    "warmup": 1,
+    "repeats": 3
+  }
+}

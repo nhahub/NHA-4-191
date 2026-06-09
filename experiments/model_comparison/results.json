@@ -1,0 +1,61 @@
+{
+  "custom_model": {
+    "name": "Custom Model",
+    "path": "/home/abdallah/Coding/DEPI-Project/Road-Sense/models/checkpoints/best-3classes-exp34332.pt",
+    "mAP50": 0.9071,
+    "mAP50-95": 0.729,
+    "precision": 0.9073,
+    "recall": 0.9586,
+    "latency_ms": 39.68,
+    "fps": 25.2,
+    "per_class": {
+      "mAP50": {
+        "Vehicle": 0.0,
+        "Pedestrian": 0.0,
+        "Cyclist": 0.0
+      },
+      "Precision": {},
+      "Recall": {}
+    }
+  },
+  "native_model": {
+    "name": "YOLOv11m",
+    "path": "yolo11m.pt",
+    "mAP50": 0.2683,
+    "mAP50-95": 0.158,
+    "precision": 0.5871,
+    "recall": 0.6836,
+    "latency_ms": 39.47,
+    "fps": 25.34,
+    "per_class": {
+      "mAP50": {
+        "Vehicle": 0.0,
+        "Pedestrian": 0.0,
+        "Cyclist": 0.0
+      },
+      "Precision": {},
+      "Recall": {}
+    }
+  },
+  "class_mapping": {
+    "custom": [
+      "Vehicle",
+      "Pedestrian",
+      "Cyclist"
+    ],
+    "native_to_custom": {
+      "Vehicle": [
+        2,
+        7,
+        5,
+        3
+      ],
+      "Pedestrian": [
+        0
+      ],
+      "Cyclist": [
+        1
+      ]
+    }
+  }
+}

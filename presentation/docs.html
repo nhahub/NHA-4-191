@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Road-Sense Documentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <nav class="top-nav reveal">
+    <div class="nav-container">
+      <div class="brand">ROAD-SENSE</div>
+      <button id="menuToggle" class="menu-toggle" aria-label="Toggle menu">Menu</button>
+      <ul id="menu" class="menu">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="docs.html" class="active">Docs</a></li>
+        <li><a href="reports.html">Reports</a></li>
+        <li><a href="visuals.html">Visuals</a></li>
+        <li><a href="detect.html">Detect</a></li>
+        <li><a href="index.html#results">Results</a></li>
+        <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">☀️</button>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="reveal">
+    <div class="panel" style="margin-top: 3rem;">
+      <div class="panel-head">
+        <p class="eyebrow">Knowledge Base</p>
+        <h2>Documentation</h2>
+      </div>
+      <div class="docs-layout">
+        <aside class="docs-sidebar">
+          <div class="sidebar-search">
+            <input type="text" id="docSearch" placeholder="Search docs..." class="search-input" />
+          </div>
+          <nav class="sidebar-nav">
+            <div class="sidebar-section">
+              <h3 class="sidebar-section-title">Getting Started</h3>
+              <ul class="sidebar-list" id="docsSidebarGettingStarted"></ul>
+            </div>
+            <div class="sidebar-section">
+              <h3 class="sidebar-section-title">Dataset</h3>
+              <ul class="sidebar-list" id="docsSidebarDataset"></ul>
+            </div>
+            <div class="sidebar-section">
+              <h3 class="sidebar-section-title">Training</h3>
+              <ul class="sidebar-list" id="docsSidebarTraining"></ul>
+            </div>
+            <div class="sidebar-section">
+              <h3 class="sidebar-section-title">Models</h3>
+              <ul class="sidebar-list" id="docsSidebarModels"></ul>
+            </div>
+            <div class="sidebar-section">
+              <h3 class="sidebar-section-title">Project Planning & Lit. Review</h3>
+              <ul class="sidebar-list" id="docsSidebarProjectPlanning"></ul>
+            </div>
+          </nav>
+        </aside>
+        <div class="docs-main">
+          <div id="docsContent" class="docs-content">
+            <p class="status-message">Select a document from the sidebar to view its contents.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer reveal">
+    <p>Road-Sense Presentation Site</p>
+    <p>Built for docs, reports, visual artifacts, and milestone communication.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
