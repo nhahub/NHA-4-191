@@ -4,9 +4,9 @@ Model Factory - Road-Sense
 Utilities for loading, inspecting, and managing YOLO models.
 """
 
-import torch
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Any
+
 from ultralytics import YOLO
 
 # Available YOLO model variants for detection
@@ -28,7 +28,7 @@ AVAILABLE_MODELS = {
 
 def load_model(
     model_name: str = "yolo11m",
-    weights_path: Optional[str] = None,
+    weights_path: str | None = None,
     pretrained: bool = True,
 ) -> YOLO:
     """
@@ -50,9 +50,7 @@ def load_model(
     """
     if model_name not in AVAILABLE_MODELS:
         available = ", ".join(AVAILABLE_MODELS.keys())
-        raise ValueError(
-            f"Unknown model '{model_name}'. Available: {available}"
-        )
+        raise ValueError(f"Unknown model '{model_name}'. Available: {available}")
 
     if weights_path is not None:
         weights_path = str(Path(weights_path))
@@ -68,18 +66,7 @@ def load_model(
     return model
 
 
-def get_model_info(model: YOLO) -> Dict[str, Any]:
-    """
-    Extract summary information from a YOLO model.
-
-    Args:
-        model: Ultralytics YOLO model instance.
-
-    Returns:
-        Dictionary with model info (name, parameters, size, classes).
-    """
-    import torch
-
+def get_model_info(model: YOLO) -> dict[str, Any]:
     info = {
         "model_type": type(model).__name__,
         "num_classes": len(model.names) if hasattr(model, "names") else None,

@@ -7,12 +7,10 @@ Callback classes for training lifecycle events:
 - Metrics monitoring
 """
 
-import json
-import shutil
 import logging
-from pathlib import Path
 from datetime import datetime
-from typing import Optional, Dict, Any
+from pathlib import Path
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -22,10 +20,10 @@ class TrainingLogger:
     Callback for logging training progress and events.
     """
 
-    def __init__(self):
-        self.train_start_time: Optional[datetime] = None
+    def __init__(self) -> None:
+        self.train_start_time: datetime | None = None
 
-    def on_train_start(self, config: Dict[str, Any]) -> None:
+    def on_train_start(self, config: dict[str, Any]) -> None:
         """Called when training begins."""
         self.train_start_time = datetime.now()
 
@@ -45,7 +43,7 @@ class TrainingLogger:
         logger.info(f"Start time: {self.train_start_time.isoformat()}")
         logger.info("=" * 60)
 
-    def on_train_end(self, results: Dict[str, Any]) -> None:
+    def on_train_end(self, results: dict[str, Any]) -> None:
         """Called when training completes."""
         end_time = datetime.now()
         duration = end_time - self.train_start_time if self.train_start_time else None
@@ -73,7 +71,7 @@ class TrainingLogger:
         logger.error(f"Time: {datetime.now().isoformat()}")
         logger.error("=" * 60)
 
-    def on_epoch_end(self, epoch: int, metrics: Dict[str, float]) -> None:
+    def on_epoch_end(self, epoch: int, metrics: dict[str, float]) -> None:
         """Called at the end of each epoch."""
         metric_str = ", ".join(f"{k}={v:.4f}" for k, v in metrics.items() if v is not None)
         logger.info(f"Epoch {epoch}: {metric_str}")
@@ -96,7 +94,7 @@ class ModelCheckpoint:
         save_last: bool = True,
         save_period: int = -1,
         metric: str = "mAP50-95",
-    ):
+    ) -> None:
         """
         Initialize the checkpoint callback.
 
@@ -116,9 +114,9 @@ class ModelCheckpoint:
         self.metric = metric
 
         self.best_metric_value = float("-inf")
-        self.best_model_path: Optional[Path] = None
+        self.best_model_path: Path | None = None
 
-    def on_epoch_end(self, epoch: int, metrics: Dict[str, float]) -> None:
+    def on_epoch_end(self, epoch: int, metrics: dict[str, float]) -> None:
         """
         Called at the end of each epoch. Decides whether to save.
 
@@ -141,10 +139,7 @@ class ModelCheckpoint:
                 self.best_metric_value = current_value
                 self._save_checkpoint("best.pt")
                 self.best_model_path = self.save_dir / "best.pt"
-                logger.info(
-                    f"New best model: {self.metric}={current_value:.4f} "
-                    f"(saved to best.pt)"
-                )
+                logger.info(f"New best model: {self.metric}={current_value:.4f} (saved to best.pt)")
 
     def _save_checkpoint(self, filename: str) -> None:
         """
@@ -161,7 +156,7 @@ class ModelCheckpoint:
         # This method is a placeholder for custom checkpoint logic.
         pass
 
-    def get_best_model_path(self) -> Optional[Path]:
+    def get_best_model_path(self) -> Path | None:
         """Return the path to the best model checkpoint."""
         if self.best_model_path and self.best_model_path.exists():
             return self.best_model_path
@@ -173,17 +168,19 @@ class ModelCheckpoint:
 
         return None
 
-    def get_checkpoint_summary(self) -> Dict[str, Any]:
+    def get_checkpoint_summary(self) -> dict[str, Any]:
         """Return a summary of saved checkpoints."""
         checkpoints = []
         if self.save_dir.exists():
             for ckpt in self.save_dir.glob("*.pt"):
                 stat = ckpt.stat()
-                checkpoints.append({
-                    "name": ckpt.name,
-                    "size_mb": stat.st_size / (1024 * 1024),
-                    "modified": datetime.fromtimestamp(stat.st_mtime).isoformat(),
-                })
+                checkpoints.append(
+                    {
+                        "name": ckpt.name,
+                        "size_mb": stat.st_size / (1024 * 1024),
+                        "modified": datetime.fromtimestamp(stat.st_mtime).isoformat(),
+                    }
+                )
 
         return {
             "save_dir": str(self.save_dir),

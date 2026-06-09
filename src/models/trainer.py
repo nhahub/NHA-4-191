@@ -6,25 +6,23 @@ Wraps Ultralytics YOLO with configuration management, logging,
 and experiment tracking.
 """
 
-import os
-import yaml
+import copy
 import json
 import logging
-import copy
-from pathlib import Path
 from datetime import datetime
-from typing import Optional, Dict, Any, Union
+from pathlib import Path
+from typing import Any
 
-import torch
+import yaml
 from ultralytics import YOLO
 
-from .model_factory import load_model, AVAILABLE_MODELS
-from .callbacks import TrainingLogger, ModelCheckpoint
+from .callbacks import ModelCheckpoint, TrainingLogger
+from .model_factory import load_model
 
 logger = logging.getLogger(__name__)
 
 
-def load_config(config_path: Union[str, Path]) -> Dict[str, Any]:
+def load_config(config_path: str | Path) -> dict[str, Any]:
     """
     Load training configuration from a YAML file.
 
@@ -41,10 +39,10 @@ def load_config(config_path: Union[str, Path]) -> Dict[str, Any]:
     if not config_path.exists():
         raise FileNotFoundError(f"Config file not found: {config_path}")
 
-    with open(config_path, "r") as f:
+    with open(config_path) as f:
         config = yaml.safe_load(f)
 
-    return config
+    return config  # noqa: RET504
 
 
 class YOLOTrainer:
@@ -59,12 +57,12 @@ class YOLOTrainer:
     - Results tracking
     """
 
-    def __init__(
+    def __init__(  # type: ignore[valid-type]
         self,
-        config: Dict[str, Any],
-        config_path: Optional[str] = None,
-        project_root: Optional[str] = None,
-    ):
+        config: dict[str, Any],
+        config_path: str | None = None,
+        project_root: str | None = None,
+    ) -> None:
         """
         Initialize the trainer.
 
@@ -77,12 +75,12 @@ class YOLOTrainer:
         self.config_path = config_path
         self.project_root = Path(project_root) if project_root else Path.cwd()
 
-        self.model: Optional[YOLO] = None
-        self.results: Optional[Dict[str, Any]] = None
-        self.save_dir: Optional[Path] = None
-        self._resolved_data_yaml: Optional[Path] = None
+        self.model: YOLO | None = None
+        self.results: dict[str, Any] | None = None
+        self.save_dir: Path | None = None
+        self._resolved_data_yaml: Path | None = None
         self.logger = TrainingLogger()
-        self.checkpointer: Optional[ModelCheckpoint] = None
+        self.checkpointer: ModelCheckpoint | None = None
 
     def setup(self) -> None:
         """
@@ -98,7 +96,7 @@ class YOLOTrainer:
         self._init_callbacks()
         self._save_config_snapshot()
 
-    def train(self, **override_kwargs) -> Dict[str, Any]:
+    def train(self, **override_kwargs: Any) -> dict[str, Any]:  # noqa: ANN401
         """
         Run the training loop.
 
@@ -110,9 +108,7 @@ class YOLOTrainer:
             Dictionary with training results and metrics.
         """
         if self.model is None:
-            raise RuntimeError(
-                "Model not initialized. Call setup() before train()."
-            )
+            raise RuntimeError("Model not initialized. Call setup() before train().")
 
         self.logger.on_train_start(self.config)
 
@@ -143,7 +139,7 @@ class YOLOTrainer:
             self.logger.on_train_error(e)
             raise
 
-    def validate(self) -> Dict[str, Any]:
+    def validate(self) -> dict[str, Any]:
         """
         Run validation on the trained model.
 
@@ -170,7 +166,7 @@ class YOLOTrainer:
 
         return metrics
 
-    def export(self, format: str = "onnx", output_dir: Optional[str] = None, **export_kwargs) -> str:
+    def export(self, format: str = "onnx", output_dir: str | None = None, **export_kwargs: Any) -> str:  # noqa: ANN401
         """
         Export the trained model to a deployment format.
 
@@ -222,7 +218,7 @@ class YOLOTrainer:
         existing = [d for d in project_dir.iterdir() if d.is_dir() and d.name.startswith(exp_name)]
         if existing and not log_cfg.get("exist_ok", False):
             max_num = max(
-                (int(d.name.replace(exp_name, "")) for d in existing if d.name[len(exp_name):].isdigit()),
+                (int(d.name.replace(exp_name, "")) for d in existing if d.name[len(exp_name) :].isdigit()),
                 default=0,
             )
             exp_name = f"{exp_name}{max_num + 1}"
@@ -254,11 +250,9 @@ class YOLOTrainer:
 
         # Log model info
         from .model_factory import get_model_info
+
         info = get_model_info(self.model)
-        logger.info(
-            f"Model loaded: {info['num_parameters'] / 1e6:.2f}M parameters, "
-            f"~{info['size_mb']:.1f} MB"
-        )
+        logger.info(f"Model loaded: {info['num_parameters'] / 1e6:.2f}M parameters, ~{info['size_mb']:.1f} MB")
 
     def _init_callbacks(self) -> None:
         """Initialize training callbacks."""
@@ -294,16 +288,7 @@ class YOLOTrainer:
 
         logger.info(f"Config snapshot saved to: {config_snapshot_path}")
 
-    def _build_train_args(self, **override_kwargs) -> Dict[str, Any]:
-        """
-        Build the training arguments dictionary from config.
-
-        Args:
-            **override_kwargs: Override specific config values.
-
-        Returns:
-            Dictionary of training arguments for model.train().
-        """
+    def _build_train_args(self, **override_kwargs: Any) -> dict[str, Any]:  # noqa: ANN401
         data_cfg = self.config.get("data", {})
         train_cfg = self.config.get("training", {})
         aug_cfg = self.config.get("augmentation", {})
@@ -316,84 +301,113 @@ class YOLOTrainer:
         data_yaml_path = self._prepare_dataset_yaml()
 
         args = {
-            # Data
-            "data": str(data_yaml_path),
-            "imgsz": data_cfg.get("imgsz", 640),
-            "batch": data_cfg.get("batch_size", 16),
-            "workers": data_cfg.get("workers", 4),
-
-            # Training
-            "epochs": train_cfg.get("epochs", 100),
-            "patience": train_cfg.get("patience", 30),
-            "optimizer": train_cfg.get("optimizer", "auto"),
-            "lr0": train_cfg.get("lr0", 0.01),
-            "lrf": train_cfg.get("lrf", 0.01),
-            "momentum": train_cfg.get("momentum", 0.937),
-            "weight_decay": train_cfg.get("weight_decay", 0.0005),
-            "warmup_epochs": train_cfg.get("warmup_epochs", 3.0),
-            "warmup_momentum": train_cfg.get("warmup_momentum", 0.8),
-            "warmup_bias_lr": train_cfg.get("warmup_bias_lr", 0.1),
-
-            # Augmentation
-            "hsv_h": aug_cfg.get("hsv_h", 0.015),
-            "hsv_s": aug_cfg.get("hsv_s", 0.7),
-            "hsv_v": aug_cfg.get("hsv_v", 0.4),
-            "degrees": aug_cfg.get("degrees", 0.0),
-            "translate": aug_cfg.get("translate", 0.1),
-            "scale": aug_cfg.get("scale", 0.5),
-            "shear": aug_cfg.get("shear", 0.0),
-            "perspective": aug_cfg.get("perspective", 0.0),
-            "flipud": aug_cfg.get("flipud", 0.0),
-            "fliplr": aug_cfg.get("fliplr", 0.5),
-            "mosaic": aug_cfg.get("mosaic", 1.0),
-            "mixup": aug_cfg.get("mixup", 0.0),
-            "copy_paste": aug_cfg.get("copy_paste", 0.0),
-
-            # Regularization
-            "dropout": reg_cfg.get("dropout", 0.0),
-
-            # Loss weights (Ultralytics defaults)
-            "box": reg_cfg.get("box", 7.5),
-            "cls": reg_cfg.get("cls", 0.5),
-            "dfl": reg_cfg.get("dfl", 1.5),
-
-            # Validation
-            "val": val_cfg.get("val_interval", 1) > 0,
-
-            # Device
-            "device": device_cfg.get("device", "0"),
-            "deterministic": device_cfg.get("deterministic", True),
-            "amp": device_cfg.get("half_precision", False),
-            "compile": device_cfg.get("compile", False),
-
-            # Advanced
-            "close_mosaic": adv_cfg.get("close_mosaic", 10),
-            "rect": adv_cfg.get("rect", False),
-            "cache": adv_cfg.get("cache", False),
-            "seed": adv_cfg.get("seed", 42),
-
-            # Logging
-            "verbose": log_cfg.get("verbose", True),
-            "project": str(self.save_dir.parent if self.save_dir else "runs/train"),
-            "name": self.save_dir.name if self.save_dir else "exp",
-            "exist_ok": log_cfg.get("exist_ok", False),
-
-            # Save
-            "save": True,
-            "save_period": ckpt_cfg.get("save_period", -1),
+            **self._build_data_args(data_cfg, data_yaml_path),
+            **self._build_train_hyperparams(train_cfg),
+            **self._build_augmentation_args(aug_cfg),
+            **self._build_regularization_args(reg_cfg),
+            **self._build_validation_args(val_cfg),
+            **self._build_device_args(device_cfg),
+            **self._build_advanced_args(adv_cfg),
+            **self._build_logging_args(log_cfg),
+            **self._build_checkpoint_args(ckpt_cfg),
         }
 
-        # Handle freeze
         freeze = adv_cfg.get("freeze", [])
         if freeze:
             args["freeze"] = freeze
 
-        # Apply overrides
         args.update(override_kwargs)
-
         return args
 
-    def _extract_metrics(self, results) -> Dict[str, float]:
+    @staticmethod
+    def _build_data_args(cfg: dict, yaml_path: Path) -> dict:
+        return {
+            "data": str(yaml_path),
+            "imgsz": cfg.get("imgsz", 640),
+            "batch": cfg.get("batch_size", 16),
+            "workers": cfg.get("workers", 4),
+        }
+
+    @staticmethod
+    def _build_train_hyperparams(cfg: dict) -> dict:
+        return {
+            "epochs": cfg.get("epochs", 100),
+            "patience": cfg.get("patience", 30),
+            "optimizer": cfg.get("optimizer", "auto"),
+            "lr0": cfg.get("lr0", 0.01),
+            "lrf": cfg.get("lrf", 0.01),
+            "momentum": cfg.get("momentum", 0.937),
+            "weight_decay": cfg.get("weight_decay", 0.0005),
+            "warmup_epochs": cfg.get("warmup_epochs", 3.0),
+            "warmup_momentum": cfg.get("warmup_momentum", 0.8),
+            "warmup_bias_lr": cfg.get("warmup_bias_lr", 0.1),
+        }
+
+    @staticmethod
+    def _build_augmentation_args(cfg: dict) -> dict:
+        return {
+            "hsv_h": cfg.get("hsv_h", 0.015),
+            "hsv_s": cfg.get("hsv_s", 0.7),
+            "hsv_v": cfg.get("hsv_v", 0.4),
+            "degrees": cfg.get("degrees", 0.0),
+            "translate": cfg.get("translate", 0.1),
+            "scale": cfg.get("scale", 0.5),
+            "shear": cfg.get("shear", 0.0),
+            "perspective": cfg.get("perspective", 0.0),
+            "flipud": cfg.get("flipud", 0.0),
+            "fliplr": cfg.get("fliplr", 0.5),
+            "mosaic": cfg.get("mosaic", 1.0),
+            "mixup": cfg.get("mixup", 0.0),
+            "copy_paste": cfg.get("copy_paste", 0.0),
+        }
+
+    @staticmethod
+    def _build_regularization_args(cfg: dict) -> dict:
+        return {
+            "dropout": cfg.get("dropout", 0.0),
+            "box": cfg.get("box", 7.5),
+            "cls": cfg.get("cls", 1.0),
+            "dfl": cfg.get("dfl", 1.5),
+        }
+
+    @staticmethod
+    def _build_validation_args(cfg: dict) -> dict:
+        return {"val": cfg.get("val_interval", 1) > 0}
+
+    @staticmethod
+    def _build_device_args(cfg: dict) -> dict:
+        return {
+            "device": cfg.get("device", "0"),
+            "deterministic": cfg.get("deterministic", True),
+            "amp": cfg.get("half_precision", False),
+            "compile": cfg.get("compile", False),
+        }
+
+    @staticmethod
+    def _build_advanced_args(cfg: dict) -> dict:
+        return {
+            "close_mosaic": cfg.get("close_mosaic", 10),
+            "rect": cfg.get("rect", False),
+            "cache": cfg.get("cache", False),
+            "seed": cfg.get("seed", 42),
+        }
+
+    @staticmethod
+    def _build_logging_args(cfg: dict) -> dict:
+        return {
+            "verbose": cfg.get("verbose", True),
+            "exist_ok": cfg.get("exist_ok", False),
+        }
+
+    def _build_checkpoint_args(self, cfg: dict) -> dict:
+        return {
+            "project": str(self.save_dir.parent if self.save_dir else "runs/train"),
+            "name": self.save_dir.name if self.save_dir else "exp",
+            "save": True,
+            "save_period": cfg.get("save_period", -1),
+        }
+
+    def _extract_metrics(self, results: Any) -> dict[str, float]:  # noqa: ANN401
         """Extract metrics from Ultralytics training/validation results."""
         metrics = {}
 
@@ -446,7 +460,7 @@ class YOLOTrainer:
         if not dataset_yaml.exists():
             raise FileNotFoundError(f"Dataset YAML not found: {dataset_yaml}")
 
-        with open(dataset_yaml, "r") as f:
+        with open(dataset_yaml) as f:
             dataset = yaml.safe_load(f) or {}
 
         if not isinstance(dataset, dict):
@@ -483,8 +497,7 @@ class YOLOTrainer:
                     normalized[key] = str((dataset_root / value_path).resolve())
             elif isinstance(value, list):
                 normalized[key] = [
-                    str(Path(p)) if Path(p).is_absolute() else str((dataset_root / p).resolve())
-                    for p in value
+                    str(Path(p)) if Path(p).is_absolute() else str((dataset_root / p).resolve()) for p in value
                 ]
 
         missing_required = []
@@ -499,9 +512,7 @@ class YOLOTrainer:
                         missing_required.append(p)
 
         if missing_required and attempt_autofix and self._should_auto_preprocess(dataset_yaml):
-            logger.warning(
-                "Detected missing processed dataset paths. Running KITTI preprocessing automatically..."
-            )
+            logger.warning("Detected missing processed dataset paths. Running KITTI preprocessing automatically...")
             self._run_kitti_preprocessing()
             return self._prepare_dataset_yaml_internal(attempt_autofix=False)
 
@@ -530,11 +541,7 @@ class YOLOTrainer:
         raw_image_dir = self.project_root / "data/raw/KITTI/training/image_2"
         raw_label_dir = self.project_root / "data/raw/KITTI/training/label_2"
 
-        return (
-            dataset_yaml.resolve() == default_yaml
-            and raw_image_dir.exists()
-            and raw_label_dir.exists()
-        )
+        return dataset_yaml.resolve() == default_yaml and raw_image_dir.exists() and raw_label_dir.exists()
 
     def _run_kitti_preprocessing(self) -> None:
         """Generate processed KITTI train/val/test splits when absent."""
@@ -565,10 +572,10 @@ class YOLOTrainer:
 
 
 def train(
-    config_path: Union[str, Path] = "configs/training.yaml",
-    project_root: Optional[Union[str, Path]] = None,
-    **override_kwargs,
-) -> Dict[str, Any]:
+    config_path: str | Path = "configs/training.yaml",
+    project_root: str | Path | None = None,
+    **override_kwargs: Any,  # noqa: ANN401
+) -> dict[str, Any]:
     """
     Convenience function to run training from a config file.
 
