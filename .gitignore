@@ -45,6 +45,7 @@ ENV/
 *.pth
 *.onnx
 *.ckpt
+*.torchscript
 !models/checkpoints/*.pt
 !models/checkpoints/**/*.pt
 
@@ -114,6 +115,16 @@ logs/
 .ipynb_checkpoints/
 
 # =====================================
+# Generated Export Artifacts (Too Large)
+# =====================================
+*.tflite
+*.npy
+**/best_saved_model/
+models/checkpoints/HPO_run/exports/
+models/checkpoints/HPO_run/weights/best.onnx
+models/checkpoints/HPO_run/weights/best.torchscript
+
+# =====================================
 # Keep Directory Structure (Empty Dirs)
 # =====================================
 !data/.gitkeep
@@ -133,3 +144,10 @@ logs/
 !data/samples/**/*.txt
 !data/samples/**/*.jpg
 
+.coverage
+
+# =====================================
+# Stray Artifact Files
+# =====================================
+preprocess_dataset (1).py
+test_preprocess_dataset.py

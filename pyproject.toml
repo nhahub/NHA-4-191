@@ -1,0 +1,72 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "road-sense"
+version = "1.0.0"
+description = "Road-Sense: Object Detection for Autonomous Vision"
+authors = [
+    {name = "Road-Sense Team"},
+]
+license = {text = "MIT"}
+requires-python = ">=3.10"
+dependencies = [
+    "ultralytics>=8.0.0",
+    "torch>=2.0.0",
+    "torchvision>=0.15.0",
+    "numpy>=1.24.0",
+    "opencv-python>=4.8.0",
+    "pillow>=10.0.0",
+    "fastapi>=0.104.0",
+    "uvicorn>=0.24.0",
+    "pydantic>=2.0.0",
+    "pyyaml>=6.0",
+    "tqdm>=4.65.0",
+    "matplotlib>=3.7.0",
+    "pandas>=2.0.0",
+    "torchmetrics>=1.0.0",
+    "python-multipart>=0.0.6",
+    "prometheus-client>=0.19.0",
+    "prometheus-fastapi-instrumentator>=7.0.0",
+    "albumentations>=1.3.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "ruff>=0.9.0",
+    "optuna>=4.0.0",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "S", "BLE", "RET"]
+ignore = ["S101", "S311", "S104"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "BLE001", "E402", "E702", "S108"]
+"scripts/*" = ["S101", "BLE001", "E402", "UP038", "S603", "S607"]
+"notebooks/*" = ["E402", "E501", "S301", "W293", "BLE001", "UP038"]
+"*.ipynb" = ["E402", "E501", "S301", "W293", "BLE001", "UP038"]
+"src/data/validate_kitti_quality.py" = ["S324", "BLE001"]
+"src/data/verify_dataset.py" = ["BLE001"]
+"src/data/augment_dataset.py" = ["BLE001"]
+"src/data/augmentations.py" = ["N812"]
+"src/data/preprocess_dataset.py" = ["BLE001"]
+"src/models/trainer.py" = ["BLE001"]
+"src/models/api_server.py" = ["BLE001"]
+"src/models/export.py" = ["BLE001", "E501"]
+"src/models/inference.py" = ["BLE001", "E501"]
+"src/models/realtime.py" = ["BLE001", "E501"]
+"train.py" = ["E402"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
