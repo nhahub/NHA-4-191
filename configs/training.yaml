@@ -58,7 +58,8 @@ augmentation:
 regularization:
   dropout: 0.0                  # Dropout fraction
   box: 7.5                      # Box loss weight
-  cls: 0.5                      # Classification loss weight (increase for minority classes)
+  cls: 1.0                      # Classification loss weight (doubled to amplify cls_pw effect)
+  cls_pw: 1.0                   # Per-class positive weight (scalar; list not supported by some Ultralytics versions)
   dfl: 1.5                      # Distribution Focal Loss weight
 
 # ==============================================================================

@@ -1,0 +1,85 @@
+# Training Configuration — HPO-optimized params
+model:
+  name: "yolo11m"
+  pretrained: true
+  pretrained_weights: null
+
+data:
+  yaml_path: "data/processed/kitti/data.yaml"
+  imgsz: 640
+  batch_size: 16
+  workers: 4
+  pin_memory: true
+
+training:
+  epochs: 100
+  patience: 50
+  optimizer: Adam
+  lr0: 0.000254
+  lrf: 0.129
+  momentum: 0.900
+  weight_decay: 0.00027
+  warmup_epochs: 3.0
+  warmup_momentum: 0.8
+  warmup_bias_lr: 0.1
+
+augmentation:
+  hsv_h: 0.034
+  hsv_s: 0.7
+  hsv_v: 0.4
+  degrees: 0.64
+  translate: 0.1
+  scale: 0.5
+  shear: 0.0
+  perspective: 0.0
+  flipud: 0.0
+  fliplr: 0.5
+  mosaic: 0.82
+  mixup: 0.99
+  copy_paste: 0.11
+
+regularization:
+  dropout: 0.0
+  box: 7.5
+  cls: 1.0
+  cls_pw: 1.0
+  dfl: 1.5
+
+validation:
+  val_interval: 1
+
+checkpoint:
+  save_dir: "models/checkpoints"
+  save_best: true
+  save_last: true
+  save_period: -1
+  metric: "mAP50-95"
+
+logging:
+  project: "runs/train"
+  name: "hpo_best"
+  exist_ok: false
+  verbose: true
+  wandb:
+    enabled: false
+    project: "road-sense"
+    entity: null
+    name: null
+    tags: ["kitti", "yolo11m", "hpo"]
+  tensorboard:
+    enabled: false
+    log_dir: "runs/tensorboard"
+
+device:
+  device: "0"
+  deterministic: true
+  half_precision: false
+  compile: false
+
+advanced:
+  close_mosaic: 10
+  freeze: []
+  rect: false
+  resume: false
+  cache: false
+  seed: 42
