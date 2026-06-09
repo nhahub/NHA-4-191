@@ -9,27 +9,24 @@ Tests cover:
 - CLI argument parsing
 """
 
-import pytest
-import json
-import yaml
+import sys
 import tempfile
 from pathlib import Path
-from unittest.mock import MagicMock, patch
 
-import sys
+import pytest
+import yaml
 
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+from src.models.callbacks import ModelCheckpoint, TrainingLogger
 from src.models.model_factory import (
-    load_model,
+    AVAILABLE_MODELS,
     get_model_info,
     list_available_models,
-    AVAILABLE_MODELS,
+    load_model,
 )
 from src.models.trainer import YOLOTrainer, load_config
-from src.models.callbacks import TrainingLogger, ModelCheckpoint
-
 
 # ==============================================================================
 # Fixtures
@@ -124,9 +121,7 @@ def sample_config():
 @pytest.fixture
 def temp_config_file(sample_config):
     """Create a temporary YAML config file."""
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".yaml", delete=False
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
         yaml.dump(sample_config, f)
         return Path(f.name)
 
@@ -137,7 +132,6 @@ def temp_config_file(sample_config):
 
 
 class TestModelFactory:
-
     def test_available_models_structure(self):
         """Test that AVAILABLE_MODELS has expected structure."""
         assert len(AVAILABLE_MODELS) > 0
@@ -194,7 +188,6 @@ class TestModelFactory:
 
 
 class TestConfigLoading:
-
     def test_load_config_valid(self, temp_config_file, sample_config):
         """Test loading a valid config file."""
         config = load_config(temp_config_file)
@@ -215,7 +208,6 @@ class TestConfigLoading:
 
 
 class TestYOLOTrainer:
-
     def test_trainer_initialization(self, sample_config):
         """Test trainer initializes correctly."""
         trainer = YOLOTrainer(config=sample_config)
@@ -232,9 +224,15 @@ class TestYOLOTrainer:
         assert trainer.save_dir is not None
         assert trainer.save_dir.exists()
 
-    def test_trainer_build_args(self, sample_config):
+    def test_trainer_build_args(self, sample_config, tmp_path):
         """Test training arguments are built correctly."""
-        trainer = YOLOTrainer(config=sample_config)
+        data_yaml = tmp_path / "data.yaml"
+        data_yaml.write_text("train: train\nval: val\nnc: 3\nnames: [a, b, c]\n")
+        (tmp_path / "train").mkdir(exist_ok=True)
+        (tmp_path / "val").mkdir(exist_ok=True)
+        sample_config["data"]["yaml_path"] = str(data_yaml)
+
+        trainer = YOLOTrainer(config=sample_config, project_root=tmp_path)
         trainer.setup()
 
         args = trainer._build_train_args()
@@ -247,9 +245,15 @@ class TestYOLOTrainer:
         assert args["batch"] == sample_config["data"]["batch_size"]
         assert args["imgsz"] == sample_config["data"]["imgsz"]
 
-    def test_trainer_build_args_with_overrides(self, sample_config):
+    def test_trainer_build_args_with_overrides(self, sample_config, tmp_path):
         """Test that overrides are applied."""
-        trainer = YOLOTrainer(config=sample_config)
+        data_yaml = tmp_path / "data.yaml"
+        data_yaml.write_text("train: train\nval: val\nnc: 3\nnames: [a, b, c]\n")
+        (tmp_path / "train").mkdir(exist_ok=True)
+        (tmp_path / "val").mkdir(exist_ok=True)
+        sample_config["data"]["yaml_path"] = str(data_yaml)
+
+        trainer = YOLOTrainer(config=sample_config, project_root=tmp_path)
         trainer.setup()
 
         args = trainer._build_train_args(epochs=50, batch=32)
@@ -286,7 +290,6 @@ class TestYOLOTrainer:
 
 
 class TestTrainingLogger:
-
     def test_logger_on_train_start(self, sample_config):
         """Test logger handles train start event."""
         logger = TrainingLogger()
@@ -315,7 +318,6 @@ class TestTrainingLogger:
 
 
 class TestModelCheckpoint:
-
     def test_checkpoint_initialization(self, tmp_path):
         """Test checkpoint callback initializes correctly."""
         ckpt = ModelCheckpoint(save_dir=tmp_path)
@@ -375,20 +377,21 @@ class TestModelCheckpoint:
 
 
 class TestCLI:
-
     def test_train_module_import(self):
         """Test that train module can be imported."""
-        from train import parse_args, setup_logging, apply_overrides
+        from train import apply_overrides, parse_args, setup_logging
+
         assert parse_args is not None
         assert setup_logging is not None
         assert apply_overrides is not None
 
     def test_parse_args_defaults(self):
         """Test CLI argument defaults."""
-        from train import parse_args
-
         # Simulate default args by passing minimal args
         import sys
+
+        from train import parse_args
+
         original_argv = sys.argv
         sys.argv = ["train.py"]
 
@@ -404,16 +407,21 @@ class TestCLI:
 
     def test_parse_args_overrides(self):
         """Test CLI argument overrides."""
-        from train import parse_args
         import sys
+
+        from train import parse_args
 
         original_argv = sys.argv
         sys.argv = [
             "train.py",
-            "--model", "yolo11s",
-            "--epochs", "50",
-            "--batch-size", "8",
-            "--device", "0",
+            "--model",
+            "yolo11s",
+            "--epochs",
+            "50",
+            "--batch-size",
+            "8",
+            "--device",
+            "0",
         ]
 
         try:
@@ -427,8 +435,9 @@ class TestCLI:
 
     def test_apply_overrides(self):
         """Test that CLI overrides are applied to config."""
-        from train import apply_overrides
         import argparse
+
+        from train import apply_overrides
 
         config = {
             "model": {"name": "yolo11m", "pretrained_weights": None, "pretrained": True},
