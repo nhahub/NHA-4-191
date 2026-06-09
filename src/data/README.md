@@ -135,7 +135,7 @@ stats = get_dataset_statistics(
 
 print_dataset_statistics(stats)
 ```
-or 
+or
 ```
 python3 scripts/quick_stats.py
 ```
@@ -288,7 +288,7 @@ Install dependencies:
 ```bash
 pip install opencv-python numpy albumentations matplotlib torch tqdm
 ```
-or 
+or
 ```bash
 pip install -r requirements.txt
 ```
