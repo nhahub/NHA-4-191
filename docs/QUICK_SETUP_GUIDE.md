@@ -1,7 +1,7 @@
 # Quick Setup Guide
-**Project:** Road-Sense - Real-Time Object Detection for Autonomous Vehicles  
-**Purpose:** Get started in 5 minutes  
-**Last Updated:** March 2026
+**Project:** Road-Sense - Real-Time Object Detection for Autonomous Vehicles
+**Purpose:** Get started in 5 minutes
+**Last Updated:** June 2026
 
 ---
 
@@ -9,7 +9,7 @@
 
 ### 1. Clone Repository
 ```bash
-git clone https://github.com/your-username/Road-Sense.git
+git clone https://github.com/Abdallah4Z/Road-Sense.git
 cd Road-Sense
 ```
 
@@ -23,25 +23,19 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 3. Test with Sample Data
-```bash
-# Use included sample files (5 images)
-python -m src.data.preprocess_dataset --config configs/sample_preprocessing.yaml
-
-# Expected output:
-# ✅ Successfully processed: 5 images
-```
-
-### 4. Verify Installation
+### 3. Verify Installation
 ```bash
 # Check YOLO installation
 python -c "from ultralytics import YOLO; print('✅ YOLO installed')"
 
 # Check PyTorch
 python -c "import torch; print(f'✅ PyTorch {torch.__version__}')"
+
+# Run the project tests
+pytest tests/ -v --tb=short
 ```
 
-**✅ Setup complete!** You can now test preprocessing with sample data.
+**✅ Setup complete!** You can now preprocess the KITTI dataset and train models.
 
 ---
 
@@ -135,10 +129,19 @@ python scripts/quick_stats.py
 python scripts/quick_visualization.py --split train --num_samples 5
 ```
 
-### Model Training (Milestone 2)
+### Model Training
 ```bash
-# Coming soon
-# python train.py --data data/processed/kitti/data.yaml --epochs 100
+# Train with default config (YOLO11m, 100 epochs)
+python train.py
+
+# Train with HPO-optimized config
+python train.py --config configs/training_hpo.yaml --epochs 100
+
+# Dry run (preview config without training)
+python train.py --dry-run
+
+# List available model variants
+python train.py --list-models
 ```
 
 ---

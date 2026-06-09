@@ -1,8 +1,8 @@
 # Week 1 Deliverables Summary
-**Project:** Road-Sense - Real-Time Object Detection for Autonomous Vehicles  
-**Milestone:** 1 - Data Collection, Exploration, and Preprocessing  
-**Status:** ✅ **COMPLETE**  
-**Date:** March 2026  
+**Project:** Road-Sense - Real-Time Object Detection for Autonomous Vehicles
+**Milestone:** 1 - Data Collection, Exploration, and Preprocessing
+**Status:** ✅ **COMPLETE**
+**Date:** March 2026
 **Team:** DEPI AI & Data Science Track - Round 2
 
 ---
@@ -12,7 +12,7 @@
 ### Required Deliverables (Per Project Proposal)
 
 #### 1. Dataset Exploration Report ✅
-**Status:** Complete  
+**Status:** Complete
 **Location:** [`docs/DATASET_EXPLORATION_REPORT.md`](docs/DATASET_EXPLORATION_REPORT.md)
 
 **Contents:**
@@ -37,7 +37,7 @@
 ---
 
 #### 2. Preprocessed Data ✅
-**Status:** Complete  
+**Status:** Complete
 **Location:** `data/processed/kitti/`
 
 **Output Structure:**
@@ -488,8 +488,8 @@ Road-Sense/
 
 ## ✅ Milestone 1 Sign-Off
 
-**Milestone:** 1 - Data Collection, Exploration, and Preprocessing  
-**Status:** ✅ **COMPLETE**  
+**Milestone:** 1 - Data Collection, Exploration, and Preprocessing
+**Status:** ✅ **COMPLETE**
 **Completion Date:** March 2026
 
 **Deliverables:**
@@ -517,13 +517,13 @@ Road-Sense/
 - **Aya Ahmed** - Dataset Exploration, Visualization ✅
 - *(Add other team members as needed)*
 
-**Next Milestone:** Milestone 2 - Object Detection Model Development  
+**Next Milestone:** Milestone 2 - Object Detection Model Development
 **Start Date:** *(To be determined)*
 
 ---
 
-**Document Version:** 1.0  
-**Last Updated:** March 2026  
+**Document Version:** 1.0
+**Last Updated:** March 2026
 **Maintained By:** Road-Sense Team
 
 ---

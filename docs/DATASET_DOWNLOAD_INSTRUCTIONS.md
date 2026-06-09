@@ -1,5 +1,5 @@
 # Dataset Download Instructions
-**Project:** Road-Sense - Real-Time Object Detection for Autonomous Vehicles  
+**Project:** Road-Sense - Real-Time Object Detection for Autonomous Vehicles
 **Last Updated:** March 2026
 
 ---
@@ -14,7 +14,7 @@ This document provides step-by-step instructions for downloading and setting up 
 
 ### 1. Register and Access
 
-1. **Visit the KITTI website:**  
+1. **Visit the KITTI website:**
    http://www.cvlibs.net/datasets/kitti/eval_object.php?obj_benchmark=2d
 
 2. **Create an account:**
@@ -339,8 +339,8 @@ After downloading the dataset:
 
 ---
 
-**Document Version:** 1.0  
-**Last Updated:** March 2026  
+**Document Version:** 1.0
+**Last Updated:** March 2026
 **Maintained By:** Road-Sense Team
 
 **Related Documents:**

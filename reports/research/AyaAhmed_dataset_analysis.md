@@ -13,13 +13,13 @@ Object Detection, Tracking, Segmentation
 - Total annotated objects: ~80,000 labeled objects
 
 ### 4. Annotation Quality
--  High-quality bounding boxes with precise labeling.  
+-  High-quality bounding boxes with precise labeling.
 
 ### 5. Environmental Diversity
-- Lighting: Day 
-- Weather: Mostly sunny / clear, limited rain/fog 
+- Lighting: Day
+- Weather: Mostly sunny / clear, limited rain/fog
 - Road Types: Urban, highway
-  
+
 ### 6. Strengths
 - Real-world driving data
 - industry relevance
@@ -55,8 +55,8 @@ Object Detection, Segmentation, Keypoint Detection, Captioning
 
 ### 5. Environmental Diversity
  High diversity in lighting, scenes, and object contexts
-- Lighting:Mixed (indoor + outdoor, day + night) 
-- Weather: Mixed / varied (mostly outdoor images, varied conditions) 
+- Lighting:Mixed (indoor + outdoor, day + night)
+- Weather: Mixed / varied (mostly outdoor images, varied conditions)
 - Road Types: Urban / rural / indoor contexts
 
 ### 6. Strengths
@@ -96,7 +96,7 @@ Object Detection, Segmentation, Keypoint Detection, Captioning
 Extremely diverse environments and real-world variations.
 - Lighting:Mixed (day, night, indoor, outdoor)
 - Weather: Mixed / varied (sunny, rainy, foggy, etc.)
-- Road Types: Urban, rural, highway, plus indoor scenes  
+- Road Types: Urban, rural, highway, plus indoor scenes
 
 ### 6. Strengths
 -  Massive scale
@@ -112,4 +112,4 @@ Extremely diverse environments and real-world variations.
 - YOLO (custom training), Faster R-CNN, EfficientDet.
 
 ### 9. Final Recommendation
--  Not Use 
+-  Not Use

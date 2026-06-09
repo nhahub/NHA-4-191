@@ -74,7 +74,7 @@ To reproduce a run with current repository defaults:
 1. Ensure KITTI data has been preprocessed to YOLO format.
 2. Run: python train.py --config configs/training.yaml
 3. Optionally override runtime options, for example:
-   python train.py --epochs 100 --batch-size 32 --workers 16 --device 1 
+   python train.py --epochs 100 --batch-size 32 --workers 16 --device 1
 
 ## Notes
 - The runs directory is ignored by default in .gitignore.

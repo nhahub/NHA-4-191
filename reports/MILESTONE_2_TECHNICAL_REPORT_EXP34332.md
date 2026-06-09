@@ -1,7 +1,7 @@
 # Milestone 2 Technical Report (exp34332)
 
-Project: Road-Sense  
-Milestone: 2 - Training and Validation  
+Project: Road-Sense
+Milestone: 2 - Training and Validation
 Run ID: exp34332
 
 ## 1. Run Context

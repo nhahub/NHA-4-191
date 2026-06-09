@@ -1,7 +1,7 @@
 # Dataset Exploration Report
-**Project:** Road-Sense - Real-Time Object Detection for Autonomous Vehicles  
-**Milestone:** 1 - Data Collection, Exploration, and Preprocessing  
-**Date:** March 2026  
+**Project:** Road-Sense - Real-Time Object Detection for Autonomous Vehicles
+**Milestone:** 1 - Data Collection, Exploration, and Preprocessing
+**Date:** March 2026
 **Team:** DEPI AI & Data Science Track - Round 2
 
 ---
@@ -13,7 +13,7 @@ This report documents the comprehensive exploration and analysis of datasets sel
 ### Key Findings
 - ✅ **KITTI Dataset**: 7,481 training images, 100% clean and validated
 - ✅ **28,742 vehicle annotations** (Cars, Vans, Trucks) - 71.5% of dataset
-- ✅ **4,487 pedestrian annotations** - 11.2% of dataset  
+- ✅ **4,487 pedestrian annotations** - 11.2% of dataset
 - ✅ **1,627 cyclist annotations** - 4.0% of dataset
 - ✅ **Zero corrupted images** or invalid annotations
 - ⚠️ **Limitation**: Daytime-only, German roads, no traffic signs
@@ -24,8 +24,8 @@ This report documents the comprehensive exploration and analysis of datasets sel
 
 ### 1.1 Primary Dataset: KITTI Vision Benchmark Suite
 
-**Source:** [KITTI Vision Benchmark Suite](http://www.cvlibs.net/datasets/kitti/)  
-**Task:** Object Detection (2D Bounding Boxes)  
+**Source:** [KITTI Vision Benchmark Suite](http://www.cvlibs.net/datasets/kitti/)
+**Task:** Object Detection (2D Bounding Boxes)
 **Publication:** "Are we ready for Autonomous Driving? The KITTI Vision Benchmark Suite" by Geiger et al., CVPR 2012
 
 #### Dataset Specifications
@@ -97,7 +97,7 @@ Example:           0 0.538 0.623 0.091 0.275
 | Misc | 973 | 2.42% | 10,898.63 | 0.07 | 0.91 |
 | DontCare | 11,295 | - | 1,882.53 | -1.0 | -1.0 |
 
-**Total Labeled Objects:** 51,869 annotations  
+**Total Labeled Objects:** 51,869 annotations
 **Usable Objects (after filtering):** 40,574 (78.2%)
 
 #### Class Merging Strategy
@@ -110,12 +110,12 @@ Merged Classes:
     - Van (2,914)
     - Truck (1,094)
     → Total: 32,750 instances (85.73%)
-  
+
   Pedestrian (Class 1):
     - Pedestrian (4,487)
     - Person_sitting (222)
     → Total: 4,709 instances (11.06%)
-  
+
   Cyclist (Class 2):
     - Cyclist (1,627)
     → Total: 1,627 instances (4.01%)
@@ -247,12 +247,12 @@ Cyclist       0.04            Rarely truncated
 Vehicle Aspect Ratios:
   Width:Height = 2.5:1 to 4:1 (typically 3:1)
   Common: 1.5-2.5 (frontal/rear view)
-  
+
 Pedestrian Aspect Ratios:
   Width:Height = 1:2 to 1:3 (vertical)
   Standing: ~1:2.5
   Walking: ~1:2.2
-  
+
 Cyclist Aspect Ratios:
   Width:Height = 1:1.5 to 1:2 (includes bicycle)
   More variable than pedestrians
@@ -269,32 +269,32 @@ Cyclist Aspect Ratios:
 ## 4. Dataset Challenges Identified
 
 ### 4.1 Class Imbalance
-**Problem:** Vehicle class dominates (85.73% of annotations)  
-**Impact:** Model may overfit to vehicles, underperform on pedestrians/cyclists  
+**Problem:** Vehicle class dominates (85.73% of annotations)
+**Impact:** Model may overfit to vehicles, underperform on pedestrians/cyclists
 **Solution:**
 - Weighted loss function (inverse frequency weights)
 - Oversampling pedestrian/cyclist scenes during training
 - Class-balanced augmentation
 
 ### 4.2 Small Object Detection
-**Problem:** Distant objects as small as 1-100 px²  
-**Impact:** Hard to detect at low resolutions  
+**Problem:** Distant objects as small as 1-100 px²
+**Impact:** Hard to detect at low resolutions
 **Solution:**
 - Multi-scale training (640, 704, 768 px)
 - Small object detection heads in YOLO
 - Filter out objects < 0.5% image area during training
 
 ### 4.3 Environmental Bias
-**Problem:** Daytime-only, German roads  
-**Impact:** Model may not generalize to night, rain, or other countries  
+**Problem:** Daytime-only, German roads
+**Impact:** Model may not generalize to night, rain, or other countries
 **Solution:**
 - Data augmentation (see Section 5)
 - Future: Add diverse datasets (BDD100K, Waymo)
 - Scope limitation: Daytime operation only for Milestone 1
 
 ### 4.4 Occlusion Handling
-**Problem:** 81% of vehicles partially occluded  
-**Impact:** Difficult to detect when multiple cars overlap  
+**Problem:** 81% of vehicles partially occluded
+**Impact:** Difficult to detect when multiple cars overlap
 **Solution:**
 - YOLO naturally handles occlusion through anchor boxes
 - Train on occluded examples (don't filter them)
@@ -321,7 +321,7 @@ Step 5: Split into train/val/test (70/20/10)
 Output: YOLO-ready dataset with data.yaml
 ```
 
-**Config File:** `configs/preprocessing.yaml`  
+**Config File:** `configs/preprocessing.yaml`
 **Script:** `src/data/preprocess_dataset.py`
 
 ### 5.2 Data Augmentation (Training Time)
@@ -502,16 +502,16 @@ While the dataset has limitations (daytime-only, no traffic signs), these are ac
 
 ## Appendix A: References
 
-1. **KITTI Dataset:**  
-   Geiger, A., Lenz, P., & Urtasun, R. (2012). "Are we ready for Autonomous Driving? The KITTI Vision Benchmark Suite." CVPR 2012.  
+1. **KITTI Dataset:**
+   Geiger, A., Lenz, P., & Urtasun, R. (2012). "Are we ready for Autonomous Driving? The KITTI Vision Benchmark Suite." CVPR 2012.
    URL: http://www.cvlibs.net/datasets/kitti/
 
-2. **YOLO (You Only Look Once):**  
-   Ultralytics YOLOv8/v11 Documentation  
+2. **YOLO (You Only Look Once):**
+   Ultralytics YOLOv8/v11 Documentation
    URL: https://docs.ultralytics.com/
 
-3. **COCO Dataset:**  
-   Lin, T.-Y., et al. (2014). "Microsoft COCO: Common Objects in Context." ECCV 2014.  
+3. **COCO Dataset:**
+   Lin, T.-Y., et al. (2014). "Microsoft COCO: Common Objects in Context." ECCV 2014.
    URL: https://cocodataset.org/
 
 ---
@@ -521,7 +521,7 @@ While the dataset has limitations (daytime-only, no traffic signs), these are ac
 ```
 docs/
 ├── DATASET_EXPLORATION_REPORT.md     # This document
-├── data_quality_report.md            # Validation 
+├── data_quality_report.md            # Validation
 
 configs/
 ├── preprocessing.yaml                # Preprocessing config
@@ -548,10 +548,10 @@ reports/research/
 
 ---
 
-**Report Prepared By:** Road-Sense Team  
-**Project:** Real-Time Object Detection for Autonomous Vehicles  
-**Milestone:** 1 - Data Collection, Exploration, and Preprocessing  
-**Status:** ✅ Complete  
+**Report Prepared By:** Road-Sense Team
+**Project:** Real-Time Object Detection for Autonomous Vehicles
+**Milestone:** 1 - Data Collection, Exploration, and Preprocessing
+**Status:** ✅ Complete
 **Date:** March 2026
 
 ---
@@ -560,4 +560,3 @@ reports/research/
 - [DATASET DOWNLOAD INSTRUCTIONS](DATASET_DOWNLOAD_INSTRUCTIONS.md)
 - [Preprocessing and Augmentation Guide](PREPROCESSING_AND_AUGMENTATION_GUIDE.md)
 - [Dataset Upload Guidelines](DATASET_UPLOAD_GUIDELINES.md)
-

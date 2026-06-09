@@ -9,16 +9,16 @@ Detection / Segmentation / Tracking: **Detection, Tracking, 3D Object Detection*
 **9** (Car, Van, Truck, Pedestrian, Person_sitting, Cyclist, Tram, Misc, DontCare)
 
 ### 3. Dataset Size
-- Total images / sequences: **14,999 images** (7,481 training, 7,518 testing)  
+- Total images / sequences: **14,999 images** (7,481 training, 7,518 testing)
 - Total annotated objects: **80,256 labeled objects**
 
 ### 4. Annotation Quality
-- **High**  
+- **High**
 - Notes: Highly accurate 2D/3D bounding boxes with LiDAR point cloud synchronization; the gold standard for geometric autonomous driving tasks.
 
 ### 5. Environmental Diversity
-- Lighting: **Day**  
-- Weather: **Sunny**  
+- Lighting: **Day**
+- Weather: **Sunny**
 - Road Types: **Highway / Urban / Rural**
 
 ### 6. Strengths
@@ -48,16 +48,16 @@ Detection / Segmentation / Tracking: **Detection, Instance Segmentation, Panopti
 **80**
 
 ### 3. Dataset Size
-- Total images / sequences: **330K images (>200K labeled)**  
+- Total images / sequences: **330K images (>200K labeled)**
 - Total annotated objects: **1.5 Million instances**
 
 ### 4. Annotation Quality
-- **High**  
+- **High**
 - Notes: Precise pixel-level segmentation masks; widely regarded as the benchmark for object localization.
 
 ### 5. Environmental Diversity
-- Lighting: **Mixed**  
-- Weather: **Mixed**  
+- Lighting: **Mixed**
+- Weather: **Mixed**
 - Road Types: **Mixed** (General outdoor and indoor scenes)
 
 ### 6. Strengths
@@ -87,16 +87,16 @@ Detection / Segmentation / Tracking: **Detection, Segmentation, Visual Relations
 **600** (Detection)
 
 ### 3. Dataset Size
-- Total images / sequences: **~9 Million total images (bounding boxes are limited to a 1.9 Million image subset).**  
+- Total images / sequences: **~9 Million total images (bounding boxes are limited to a 1.9 Million image subset).**
 - Total annotated objects: **~16 Million bounding boxes**
 
 ### 4. Annotation Quality
-- **High**  
+- **High**
 - Notes: Manually verified bounding boxes; high density of objects per image (~8.4).
 
 ### 5. Environmental Diversity
-- Lighting: **Mixed / High Diversity**  
-- Weather: **Mixed**  
+- Lighting: **Mixed / High Diversity**
+- Weather: **Mixed**
 - Road Types: **Mixed** (Global diversity)
 
 ### 6. Strengths

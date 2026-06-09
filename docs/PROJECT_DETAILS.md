@@ -73,3 +73,4 @@ Quality validation snapshot:
 - docs/DATASET_DOWNLOAD_INSTRUCTIONS.md
 - docs/TRAINING_REPORT_EXP34332.md
 - reports/PROJECT_STATUS_REPORT.md
+[text](project_planning)

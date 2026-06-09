@@ -56,10 +56,10 @@ Classes: 3 (Vehicle, Pedestrian, Cyclist)
 2. **Fine-tune YOLO**
    ```python
    from ultralytics import YOLO
-   
+
    # Load COCO pre-trained model
    model = YOLO('yolov8n.pt')
-   
+
    # Fine-tune on KITTI
    results = model.train(
        data='data/processed/kitti/data.yaml',
@@ -110,7 +110,7 @@ Approach: Continue training from Stage 1 model
    ```python
    # Load Stage 1 model
    model = YOLO('runs/detect/kitti_vehicles_pedestrians/weights/best.pt')
-   
+
    # Add new classes for traffic signs
    # Fine-tune on GTSDB while preserving vehicle/pedestrian detection
    results = model.train(
@@ -149,23 +149,23 @@ Size: Generate 5,000-10,000 synthetic images
    for kitti_image in kitti_images:
        # Load KITTI image
        img = load_image(kitti_image)
-       
+
        # Randomly select 1-3 traffic signs from GTSRB
        signs = random.sample(gtsrb_train, k=random.randint(1, 3))
-       
+
        for sign in signs:
            # Resize sign to realistic size (50-150 pixels)
            sign_resized = resize(sign, size=random.randint(50, 150))
-           
+
            # Find valid placement (not overlapping with vehicles)
            position = find_valid_position(img, existing_bboxes)
-           
+
            # Paste sign with random transformations
            img = paste_with_augmentation(img, sign_resized, position)
-           
+
            # Add bounding box annotation
            bboxes.append([position, sign_class])
-       
+
        # Save synthetic image and labels
        save_yolo_format(img, bboxes)
    ```
@@ -184,7 +184,7 @@ Size: Generate 5,000-10,000 synthetic images
 3. **Train on Combined Dataset**
    ```python
    model = YOLO('runs/detect/kitti_vehicles_pedestrians/weights/best.pt')
-   
+
    results = model.train(
        data='data/processed/combined/data.yaml',
        epochs=50,
@@ -260,9 +260,9 @@ Train on both datasets simultaneously from the start.
 3. ✅ **Train YOLO on KITTI**
    ```python
    from ultralytics import YOLO
-   
+
    model = YOLO('yolov8n.pt')  # or yolov8s, yolov8m for better accuracy
-   
+
    results = model.train(
        data='data/processed/kitti/data.yaml',
        epochs=100,
@@ -287,7 +287,7 @@ Train on both datasets simultaneously from the start.
        save=True,
        stream=True
    )
-   
+
    # Measure FPS
    for r in results:
        fps = 1.0 / r.speed['inference']
@@ -328,7 +328,7 @@ Train on both datasets simultaneously from the start.
    ```python
    # Load Stage 1 model
    model = YOLO('runs/detect/kitti_baseline/weights/best.pt')
-   
+
    # Fine-tune on combined dataset
    results = model.train(
        data='data/processed/combined/data.yaml',
@@ -421,7 +421,7 @@ results = model.train(
     epochs=50,
     batch=16,
     cls=0.5,  # Classification loss weight
-    box=7.5,  # Box loss weight  
+    box=7.5,  # Box loss weight
     obj=1.0,  # Objectness loss weight
 )
 ```

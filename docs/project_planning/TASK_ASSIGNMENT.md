@@ -65,7 +65,6 @@
 | Responsibility | Description | Tasks |
 |----------------|-------------|-------|
 | **EDA & Data Report** | Run EDA and write dataset exploration report | M1.8 |
-| **Custom CNN Training** | Train and tune custom CNN-from-scratch model | M2.5 |
 | **Temporal Object Tracking** | Implement IoU + EMA tracking for API | M3.2 |
 | **Export Validation** | Validate exported model formats | M3.4 |
 | **CI/CD Pipeline** | Set up GitHub Actions for tests + linting | M4.4 |
@@ -108,7 +107,6 @@
 
 | Responsibility | Description | Tasks |
 |----------------|-------------|-------|
-| **Custom CNN Development** | Design and build custom CNN-from-scratch model | M2.4 |
 | **Docker Setup** | Create Dockerfile and containerize application | M3.7 |
 | **Export Benchmarks** | Run export format benchmarks | M4.5 |
 
@@ -130,15 +128,13 @@
 | M2.1 | YOLO model factory (10 variants) | Abdallah Zain |
 | M2.2 | Training lifecycle manager (YOLOTrainer) | Abdallah Zain + FatmaElzahraa Wahby |
 | M2.3 | Training configuration YAML | FatmaElzahraa Wahby |
-| M2.4 | Custom CNN from scratch | Mohamed Abd El Mawgoud |
-| M2.5 | Custom CNN training & tuning | Ahmed Elkady |
-| M2.6 | YOLO11m baseline training | Abdallah Zain |
-| M2.7 | Training callbacks (logging, checkpointing) | Aya Ahmed |
-| M2.8 | YOLO hyperparameter tuning | Abdallah Zain |
-| M2.9 | Model benchmarking (CNN vs YOLO vs SSD vs R-CNN) | All members |
-| M2.10 | Training report (exp34332) | Menna Tuallah Farghaly |
-| M2.11 | Model comparison report | Menna Tuallah Farghaly |
-| M2.12 | HPO report | Menna Tuallah Farghaly |
+| M2.4 | YOLO11m baseline training | Abdallah Zain |
+| M2.5 | Training callbacks (logging, checkpointing) | Aya Ahmed |
+| M2.6 | YOLO hyperparameter tuning | Abdallah Zain |
+| M2.7 | Model benchmarking (YOLO vs SSD vs Faster R-CNN) | All members |
+| M2.8 | Training report (exp34332) | Menna Tuallah Farghaly |
+| M2.9 | Model comparison report | Menna Tuallah Farghaly |
+| M2.10 | HPO report | Menna Tuallah Farghaly |
 | M3.1 | FastAPI inference server | Abdallah Zain |
 | M3.2 | Temporal object tracking (IoU + EMA) | Ahmed Elkady |
 | M3.3 | Model export (ONNX, TFLite, TorchScript) | Abdallah Zain |
@@ -175,7 +171,6 @@
 | `src/data/preprocess_dataset.py` | Abdallah Zain | Mohamed | Ahmed Elkady |
 | `src/data/validate_kitti_quality.py` | FatmaElzahraa Wahby | Menna Tuallah | Aya Ahmed |
 | `src/data/verify_dataset.py` | Ahmed Elkady | FatmaElzahraa | Abdallah Zain |
-| `src/models/cnn_model.py` (custom from scratch) | Mohamed Abd El Mawgoud | Ahmed Elkady | Abdallah Zain |
 | `src/models/model_factory.py` | Abdallah Zain | Ahmed Elkady | Mohamed |
 | `src/models/trainer.py` | Abdallah Zain | FatmaElzahraa Wahby | Mohamed |
 | `src/models/inference.py` | Menna Tuallah Farghaly | Ahmed Elkady | Abdallah Zain |

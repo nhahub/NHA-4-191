@@ -1,6 +1,6 @@
 # Dataset Upload Guidelines
-**Project:** Road-Sense - Real-Time Object Detection for Autonomous Vehicles  
-**Purpose:** Git repository best practices for dataset management  
+**Project:** Road-Sense - Real-Time Object Detection for Autonomous Vehicles
+**Purpose:** Git repository best practices for dataset management
 **Last Updated:** March 2026
 
 ---
@@ -716,8 +716,8 @@ dvc pull
 
 ---
 
-**Document Version:** 1.0  
-**Last Updated:** March 2026  
+**Document Version:** 1.0
+**Last Updated:** March 2026
 **Maintained By:** Road-Sense Team
 
 **Related Documents:**

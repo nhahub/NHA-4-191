@@ -9,16 +9,16 @@ Detection / Segmentation / Tracking: [Choose]
 [Insert Number]
 
 ### 3. Dataset Size
-- Total images / sequences: [Insert Number]  
+- Total images / sequences: [Insert Number]
 - Total annotated objects: [Insert Number]
 
 ### 4. Annotation Quality
-- [High / Medium / Low]  
+- [High / Medium / Low]
 - Notes: [e.g., bounding boxes accurate, missing labels, etc.]
 
 ### 5. Environmental Diversity
-- Lighting: [Day / Night / Mixed]  
-- Weather: [Sunny / Rain / Fog / Snow]  
+- Lighting: [Day / Night / Mixed]
+- Weather: [Sunny / Rain / Fog / Snow]
 - Road Types: [Highway / Urban / Rural]
 
 ### 6. Strengths
@@ -44,16 +44,16 @@ Detection / Segmentation / Tracking: [Choose]
 [Insert Number]
 
 ### 3. Dataset Size
-- Total images / sequences: [Insert Number]  
+- Total images / sequences: [Insert Number]
 - Total annotated objects: [Insert Number]
 
 ### 4. Annotation Quality
-- [High / Medium / Low]  
+- [High / Medium / Low]
 - Notes: [e.g., bounding boxes accurate, missing labels, etc.]
 
 ### 5. Environmental Diversity
-- Lighting: [Day / Night / Mixed]  
-- Weather: [Sunny / Rain / Fog / Snow]  
+- Lighting: [Day / Night / Mixed]
+- Weather: [Sunny / Rain / Fog / Snow]
 - Road Types: [Highway / Urban / Rural]
 
 ### 6. Strengths
@@ -79,16 +79,16 @@ Detection / Segmentation / Tracking: [Choose]
 [Insert Number]
 
 ### 3. Dataset Size
-- Total images / sequences: [Insert Number]  
+- Total images / sequences: [Insert Number]
 - Total annotated objects: [Insert Number]
 
 ### 4. Annotation Quality
-- [High / Medium / Low]  
+- [High / Medium / Low]
 - Notes: [e.g., bounding boxes accurate, missing labels, etc.]
 
 ### 5. Environmental Diversity
-- Lighting: [Day / Night / Mixed]  
-- Weather: [Sunny / Rain / Fog / Snow]  
+- Lighting: [Day / Night / Mixed]
+- Weather: [Sunny / Rain / Fog / Snow]
 - Road Types: [Highway / Urban / Rural]
 
 ### 6. Strengths

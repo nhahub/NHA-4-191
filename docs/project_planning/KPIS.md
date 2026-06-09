@@ -130,8 +130,8 @@ The success of Road-Sense is measured across **five dimensions**: Model Performa
 
 | Trigger Condition | Action |
 |-------------------|--------|
-| Any MP KPI below 80% of target | Schedule model improvement sprint | 
-| Any SP KPI below 70% of target | Performance optimization sprint | 
-| CQ-01 (test pass rate) below 100% | Block PR merges until all tests pass | 
-| PM-01 (on-time delivery) below target | Re-plan remaining milestones with advisor | 
-| DC-01 (documents missing) | Reallocate team members to documentation | 
+| Any MP KPI below 80% of target | Schedule model improvement sprint |
+| Any SP KPI below 70% of target | Performance optimization sprint |
+| CQ-01 (test pass rate) below 100% | Block PR merges until all tests pass |
+| PM-01 (on-time delivery) below target | Re-plan remaining milestones with advisor |
+| DC-01 (documents missing) | Reallocate team members to documentation |

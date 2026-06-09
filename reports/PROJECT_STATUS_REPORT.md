@@ -1,7 +1,7 @@
 # Project Status Report
 
-Project: Road-Sense  
-Track: DEPI AI and Data Science Track  
+Project: Road-Sense
+Track: DEPI AI and Data Science Track
 Last Updated: April 2026
 
 ## Executive Status

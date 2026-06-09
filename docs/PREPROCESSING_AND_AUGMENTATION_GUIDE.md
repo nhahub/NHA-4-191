@@ -1,6 +1,6 @@
 # Preprocessing and Augmentation Guide
-**Project:** Road-Sense - Real-Time Object Detection for Autonomous Vehicles  
-**Documentation for:** Milestone 1 Deliverables  
+**Project:** Road-Sense - Real-Time Object Detection for Autonomous Vehicles
+**Documentation for:** Milestone 1 Deliverables
 **Last Updated:** March 2026
 
 ---
@@ -21,12 +21,12 @@
 This guide documents the complete preprocessing and augmentation pipeline for the Road-Sense project. The pipeline converts raw KITTI format data into YOLO-ready format with comprehensive quality validation and augmentation strategies.
 
 ### Pipeline Goals
-✅ Convert KITTI format → YOLO format  
-✅ Standardize image sizes (640×640 for YOLO)  
-✅ Merge and filter object classes  
-✅ Create reproducible train/val/test splits  
-✅ Apply data augmentation for robustness  
-✅ Validate data quality at every step  
+✅ Convert KITTI format → YOLO format
+✅ Standardize image sizes (640×640 for YOLO)
+✅ Merge and filter object classes
+✅ Create reproducible train/val/test splits
+✅ Apply data augmentation for robustness
+✅ Validate data quality at every step
 
 ### Key Outputs
 - **Preprocessed Dataset:** `data/processed/kitti/`
@@ -175,14 +175,14 @@ label_conversion:
     Car: 0
     Van: 0
     Truck: 0
-    
+
     # Merge pedestrian types → Class 1
     Pedestrian: 1
     Person_sitting: 1
-    
+
     # Cyclists → Class 2
     Cyclist: 2
-  
+
   # Classes to skip (not written to output)
   exclude_classes:
     - "DontCare"     # Ambiguous regions
@@ -194,12 +194,12 @@ label_conversion:
 ```yaml
 label_conversion:
   min_bbox_size: 0.005  # Minimum area (0.5% of image)
-  
+
 # Explanation:
 # At 640×640 pixels:
 # 0.5% of image = 0.005 × 640 × 640 = 2,048 pixels²
 # Min bbox ≈ 45×45 pixels (very small, but detectable)
-# 
+#
 # Filters out:
 # - Very distant objects (too small to detect reliably)
 # - Heavily occluded objects (tiny visible portion)
@@ -370,7 +370,7 @@ mosaic: 1.0  # Probability of mosaic augmentation
 # 1. Select 4 random training images
 # 2. Randomly scale and place in 2×2 grid
 # 3. Crop to final size (640×640)
-# 
+#
 # Benefits:
 # - More objects per training image (better for small objects)
 # - Diverse context (forces model to handle multiple scenes)
@@ -460,7 +460,7 @@ mixup: 0.1  # 10% probability
 # 1. Select two images
 # 2. Blend: mixed_image = alpha * img1 + (1-alpha) * img2
 # 3. Combine labels from both images
-# 
+#
 # Benefits:
 # - Reduces overfitting
 # - Improves generalization
@@ -475,7 +475,7 @@ copy_paste: 0.1  # 10% probability
 # 1. Select instance from another image
 # 2. Paste onto current image
 # 3. Update labels
-# 
+#
 # Benefits:
 # - Increases object count per image
 # - Better for minority classes (Pedestrian, Cyclist)
@@ -494,7 +494,7 @@ results = model.train(
     epochs=100,
     imgsz=640,
     batch=16,
-    
+
     # Augmentation parameters
     mosaic=1.0,         # Enable mosaic
     mixup=0.1,          # 10% mixup
@@ -536,13 +536,13 @@ augmentation_pipeline = A.Compose([
     A.HorizontalFlip(p=0.5),
     A.Rotate(limit=5, p=0.3),
     A.ShiftScaleRotate(shift_limit=0.1, scale_limit=0.2, rotate_limit=5, p=0.5),
-    
+
     # Photometric
     A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2, p=0.5),
     A.HueSaturationValue(hue_shift_limit=10, sat_shift_limit=30, val_shift_limit=20, p=0.5),
     A.GaussianBlur(blur_limit=(3, 7), p=0.3),
     A.GaussNoise(var_limit=(10, 50), p=0.3),
-    
+
     # Weather simulation
     A.RandomFog(fog_coef_lower=0.1, fog_coef_upper=0.3, p=0.1),
     A.RandomRain(slant_lower=-10, slant_upper=10, p=0.1),
@@ -583,7 +583,7 @@ image_processing:
 # Label conversion (KITTI → YOLO)
 label_conversion:
   format: "yolo"
-  
+
   class_mapping:
     Car: 0
     Van: 0
@@ -591,12 +591,12 @@ label_conversion:
     Pedestrian: 1
     Person_sitting: 1
     Cyclist: 2
-  
+
   exclude_classes:
     - "DontCare"
     - "Misc"
     - "Tram"
-  
+
   min_bbox_size: 0.005
 
 # Dataset splitting
@@ -635,7 +635,7 @@ datasets:
     type: "kitti"
     path: "data/raw/KITTI/training"
     classes: [0, 1, 2]  # Vehicle, Pedestrian, Cyclist
-    
+
   - name: "gtsdb"
     type: "gtsdb"
     path: "data/raw/GTSDB"
@@ -923,6 +923,6 @@ head -5 data/processed/kitti/labels/train/000000.txt
 
 ---
 
-**Document Version:** 1.0  
-**Last Updated:** March 2026  
+**Document Version:** 1.0
+**Last Updated:** March 2026
 **Maintained By:** Road-Sense Team

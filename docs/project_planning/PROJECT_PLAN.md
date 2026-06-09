@@ -79,15 +79,13 @@ M5: DOCS & PRESENTATION  |     |     |     |     |     |     |     |     |     |
 | M2.1 | Set up YOLO model factory (support 10 YOLO variants) | 3 days | M1.9 | Abdallah Zain |
 | M2.2 | Implement training lifecycle manager (YOLOTrainer) | 5 days | M2.1 | Abdallah Zain and FatmaElzahraa Wahby |
 | M2.3 | Create training configuration YAML (hyperparameters) | 2 days | M2.2 | FatmaElzahraa Wahby |
-| M2.4 | Build custom CNN model from scratch (architecture design, layers, forward pass) | 5 days | M1.9 | Mohamed Abd El Mawgoud |
-| M2.5 | Train custom CNN model (hyperparameter tuning, evaluation) | 5 days | M2.4 | Ahmed Elkady |
-| M2.6 | Run YOLO11m baseline training (100 epochs) | 5 days | M2.3 | Abdallah Zain |
-| M2.7 | Implement training callbacks (logging, checkpointing) | 3 days | M2.2 | Aya Ahmed |
-| M2.8 | Run YOLO hyperparameter tuning experiments | 5 days | M2.6 | Abdallah Zain |
-| M2.9 | Benchmark custom CNN vs YOLO vs SSD vs Faster R-CNN | 5 days | M2.5, M2.6 | All members |
-| M2.10 | Write training report (exp34332 baseline) | 3 days | M2.6 | Menna Tuallah Farghaly |
-| M2.11 | Write model comparison report | 3 days | M2.9 | Menna Tuallah Farghaly |
-| M2.12 | Write HPO report (hyperparameter optimization results) | 3 days | M2.5, M2.8 | Menna Tuallah Farghaly |
+| M2.4 | Run YOLO11m baseline training (100 epochs) | 5 days | M2.3 | Abdallah Zain |
+| M2.5 | Implement training callbacks (logging, checkpointing) | 3 days | M2.2 | Aya Ahmed |
+| M2.6 | Run YOLO hyperparameter tuning experiments | 5 days | M2.4 | Abdallah Zain |
+| M2.7 | Benchmark YOLO vs SSD vs Faster R-CNN | 5 days | M2.4 | All members |
+| M2.8 | Write training report (exp34332 baseline) | 3 days | M2.4 | Menna Tuallah Farghaly |
+| M2.9 | Write model comparison report | 3 days | M2.7 | Menna Tuallah Farghaly |
+| M2.10 | Write HPO report (hyperparameter optimization results) | 3 days | M2.6 | Menna Tuallah Farghaly |
 
 #### M3: Deployment & API Development (Weeks 6-7)
 

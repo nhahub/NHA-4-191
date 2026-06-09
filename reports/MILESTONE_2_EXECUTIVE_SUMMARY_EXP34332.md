@@ -1,8 +1,8 @@
 # Milestone 2 Executive Summary (exp34332)
 
-Project: Road-Sense  
-Milestone: 2 - Model Training and Validation  
-Run ID: exp34332  
+Project: Road-Sense
+Milestone: 2 - Model Training and Validation
+Run ID: exp34332
 Date: April 2026
 
 ## Objective
