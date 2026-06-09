@@ -21,20 +21,20 @@ Usage:
     python train.py --dry-run
 """
 
-import sys
+import argparse
 import json
 import logging
-import argparse
+import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, TextIO
+from typing import TextIO
 
 # Add project root to path
 project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 
-from src.models.trainer import YOLOTrainer, load_config
 from src.models.model_factory import list_available_models
+from src.models.trainer import YOLOTrainer, load_config
 
 logger = logging.getLogger(__name__)
 
@@ -106,10 +106,7 @@ Examples:
         "--log-file",
         type=str,
         default=None,
-        help=(
-            "Path to combined console log file. "
-            "Default: logs/train_<timestamp>.log"
-        ),
+        help=("Path to combined console log file. Default: logs/train_<timestamp>.log"),
     )
 
     # Model overrides
@@ -216,22 +213,14 @@ Examples:
 
 def setup_logging(verbose: bool = True, quiet: bool = False) -> None:
     """Configure logging based on CLI arguments."""
+    from src.utils import setup_logging as _setup_logging
+
+    _setup_logging(verbose=verbose)
     if quiet:
-        level = logging.WARNING
-    elif verbose:
-        level = logging.DEBUG
-    else:
-        level = logging.INFO
-
-    logging.basicConfig(
-        level=level,
-        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-        force=True,
-    )
+        logging.getLogger().setLevel(logging.WARNING)
 
 
-def setup_log_file(log_file: Optional[str], project_root: Path) -> tuple[Path, TextIO]:
+def setup_log_file(log_file: str | None, project_root: Path) -> tuple[Path, TextIO]:
     """Create a log file and tee stdout/stderr to terminal + file."""
     if log_file:
         target = Path(log_file)
@@ -291,28 +280,63 @@ def apply_overrides(config: dict, args: argparse.Namespace) -> dict:
     return config
 
 
+def _handle_resume(config: dict, resume: str) -> bool:
+    resume_path = Path(resume)
+    if not resume_path.exists():
+        logger.error(f"Checkpoint not found: {resume_path}")
+        return False
+    config["model"]["pretrained_weights"] = str(resume_path)
+    config["model"]["pretrained"] = False
+    config["advanced"]["resume"] = True
+    logger.info(f"Resuming training from: {resume_path}")
+    return True
+
+
+def _run_training(config: dict, config_path: str, project_root: Path) -> int:
+    try:
+        trainer = YOLOTrainer(
+            config=config,
+            config_path=config_path,
+            project_root=str(project_root),
+        )
+        trainer.setup()
+        results = trainer.train()
+
+        print("\n" + "=" * 60)
+        print("TRAINING SUMMARY")
+        print("=" * 60)
+        print(f"Model: {config['model']['name']}")
+        print(f"Epochs: {results['epochs_trained']}")
+        print(f"Save directory: {results['save_dir']}")
+
+        if results["metrics"]:
+            print("\nMetrics:")
+            for key, value in results["metrics"].items():
+                print(f"  {key}: {value}")
+        print("=" * 60)
+        return 0
+    except Exception as e:
+        logger.error(f"Training failed: {e}", exc_info=True)
+        return 1
+
+
 def main() -> int:
-    """Main entry point."""
     args = parse_args()
     project_root = Path(args.project_root).resolve() if args.project_root else Path.cwd()
     original_stdout = sys.stdout
     original_stderr = sys.stderr
 
-    log_stream: Optional[TextIO] = None
+    log_stream: TextIO | None = None
 
     try:
         log_file_path, log_stream = setup_log_file(args.log_file, project_root)
-
-        # Setup logging
         setup_logging(verbose=args.verbose, quiet=args.quiet)
         logger.info(f"Console output is being logged to: {log_file_path}")
 
-        # List models and exit
         if args.list_models:
             list_models()
             return 0
 
-        # Load config
         logger.info(f"Loading config from: {args.config}")
         try:
             config = load_config(args.config)
@@ -320,10 +344,8 @@ def main() -> int:
             logger.error(f"Config error: {e}")
             return 1
 
-        # Apply CLI overrides
         config = apply_overrides(config, args)
 
-        # Dry run: print config and exit
         if args.dry_run:
             print("\nTraining Configuration:")
             print("=" * 60)
@@ -331,48 +353,10 @@ def main() -> int:
             print("=" * 60)
             return 0
 
-        # Handle resume
-        if args.resume:
-            resume_path = Path(args.resume)
-            if not resume_path.exists():
-                logger.error(f"Checkpoint not found: {resume_path}")
-                return 1
-            config["model"]["pretrained_weights"] = str(resume_path)
-            config["model"]["pretrained"] = False
-            config["advanced"]["resume"] = True
-            logger.info(f"Resuming training from: {resume_path}")
-
-        # Initialize and run training
-        try:
-            trainer = YOLOTrainer(
-                config=config,
-                config_path=str(args.config),
-                project_root=str(project_root),
-            )
-
-            trainer.setup()
-            results = trainer.train()
-
-            # Print summary
-            print("\n" + "=" * 60)
-            print("TRAINING SUMMARY")
-            print("=" * 60)
-            print(f"Model: {config['model']['name']}")
-            print(f"Epochs: {results['epochs_trained']}")
-            print(f"Save directory: {results['save_dir']}")
-
-            if results["metrics"]:
-                print("\nMetrics:")
-                for key, value in results["metrics"].items():
-                    print(f"  {key}: {value}")
-
-            print("=" * 60)
-
-            return 0
-
-        except Exception as e:
-            logger.error(f"Training failed: {e}", exc_info=True)
+        if args.resume and not _handle_resume(config, args.resume):
             return 1
+
+        return _run_training(config, args.config, project_root)
 
     finally:
         sys.stdout = original_stdout
