@@ -1,4 +1,4 @@
-Format,Model Path,Model Size (MB),mAP@50,mAP@50-95,Precision,Recall,Latency (ms),FPS,Error
-pt,/home/abdallah/Coding/DEPI-Project/Road-Sense/models/exports/best-3classes-exp34332-original.pt,38.65,0.9867,0.9867,0.875,0.9852,37.07,26.97,
-torchscript,/home/abdallah/Coding/DEPI-Project/Road-Sense/models/exports/best-3classes-exp34332.torchscript,77.08,0.9867,0.9867,0.875,0.9852,37.25,26.84,
-onnx,/home/abdallah/Coding/DEPI-Project/Road-Sense/models/exports/best-3classes-exp34332.onnx,38.32,0.9867,0.9867,0.875,0.9852,369.59,2.71,
+Format,Model Size (MB),mAP@50,mAP@50-95,Latency Avg (ms),Latency p50 (ms),Latency p95 (ms),Latency p99 (ms),FPS,Peak RAM (MB),Device
+pytorch,38.65,0.9458,0.9458,29.76,29.51,32.07,33.15,33.6,2852.3,GPU (RTX 3050)
+onnx_fp16,38.32,0.9458,0.9458,22.68,21.9,28.21,34.41,44.09,3333.4,GPU (RTX 3050)
+torchscript,77.04,0.9458,0.9458,30.1,29.75,33.26,34.44,33.22,3337.2,GPU (RTX 3050)

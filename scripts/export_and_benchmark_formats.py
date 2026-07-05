@@ -20,6 +20,7 @@ Outputs:
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import time
 from dataclasses import dataclass
@@ -28,6 +29,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import psutil
 import torch
 from PIL import Image
 from torchmetrics.detection import MeanAveragePrecision
@@ -38,7 +40,7 @@ from src.utils import ensure_dir
 
 # Paths
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-MODEL_PATH = PROJECT_ROOT / "models/checkpoints/best-3classes-exp34332.pt"
+MODEL_PATH = PROJECT_ROOT / "models/checkpoints/HPO_run/weights/best.pt"
 VAL_IMAGES_DIR = PROJECT_ROOT / "data/processed/kitti/images/val"
 VAL_LABELS_DIR = PROJECT_ROOT / "data/processed/kitti/labels/val"
 EXPORT_DIR = PROJECT_ROOT / "models/exports"
@@ -69,7 +71,11 @@ class FormatResult:
     map50: float
     map5095: float
     latency_ms: float
+    latency_p50: float
+    latency_p95: float
+    latency_p99: float
     fps: float
+    ram_peak_mb: float
     export_success: bool
     benchmark_success: bool
     error_msg: str = ""
@@ -174,7 +180,7 @@ def _format_result(
     size_mb: float = 0.0,
     success: bool = False,
     error: str = "",
-) -> FormatResult:
+    ) -> FormatResult:
     return FormatResult(
         format_name=format_name,
         model_path=path,
@@ -182,7 +188,11 @@ def _format_result(
         map50=0.0,
         map5095=0.0,
         latency_ms=0.0,
+        latency_p50=0.0,
+        latency_p95=0.0,
+        latency_p99=0.0,
         fps=0.0,
+        ram_peak_mb=0.0,
         export_success=success,
         benchmark_success=False,
         error_msg=error,
@@ -325,6 +335,8 @@ def benchmark_format(
     # Setup metric
     metric = MeanAveragePrecision(box_format="xyxy", iou_type="bbox", iou_thresholds=[0.5])
     latencies = []
+    proc = psutil.Process(os.getpid())
+    ram_history = []
 
     # Warmup
     print(f"  Running {WARMUP_ITERATIONS} warmup iterations...")
@@ -356,6 +368,7 @@ def benchmark_format(
                 torch.cuda.synchronize()
             elapsed_ms = (time.perf_counter() - start) * 1000.0
             latencies.append(elapsed_ms)
+            ram_history.append(proc.memory_info().rss / (1024 * 1024))
 
             # Get predictions
             result = results[0]
@@ -380,12 +393,20 @@ def benchmark_format(
     map5095 = float(maps.get("map", torch.tensor(0.0)).item())
 
     latency_ms = float(np.mean(latencies)) if latencies else float("nan")
+    sorted_lats = sorted(latencies)
+    n_lat = len(sorted_lats)
+    latency_p50 = float(sorted_lats[int(n_lat * 0.50)]) if n_lat else 0.0
+    latency_p95 = float(sorted_lats[int(n_lat * 0.95)]) if n_lat else 0.0
+    latency_p99 = float(sorted_lats[int(n_lat * 0.99)]) if n_lat else 0.0
     fps = 1000.0 / latency_ms if latency_ms > 0 else 0.0
+    ram_peak_mb = float(max(ram_history)) if ram_history else 0.0
 
     print(f"  ✓ mAP@50: {map50:.4f}, mAP@50-95: {map5095:.4f}")
-    print(f"  ✓ Latency: {latency_ms:.2f}ms, FPS: {fps:.2f}")
+    print(f"  ✓ Latency: avg={latency_ms:.2f}ms, p50={latency_p50:.2f}ms, "
+          f"p95={latency_p95:.2f}ms, p99={latency_p99:.2f}ms")
+    print(f"  ✓ FPS: {fps:.2f}, Peak RAM: {ram_peak_mb:.1f} MB")
 
-    return map50, map5095, latency_ms, fps
+    return map50, map5095, latency_ms, latency_p50, latency_p95, latency_p99, fps, ram_peak_mb
 
 
 def benchmark_all_formats(
@@ -404,7 +425,7 @@ def benchmark_all_formats(
     for res in results:
         if res.export_success:
             try:
-                map50, map5095, latency_ms, fps = benchmark_format(
+                map50, map5095, latency_ms, latency_p50, latency_p95, latency_p99, fps, ram_peak_mb = benchmark_format(
                     res.format_name,
                     res.model_path,
                     image_paths,
@@ -414,7 +435,11 @@ def benchmark_all_formats(
                 res.map50 = map50
                 res.map5095 = map5095
                 res.latency_ms = latency_ms
+                res.latency_p50 = latency_p50
+                res.latency_p95 = latency_p95
+                res.latency_p99 = latency_p99
                 res.fps = fps
+                res.ram_peak_mb = ram_peak_mb
                 res.benchmark_success = True
             except Exception as e:
                 print(f"  ✗ Benchmark failed for {res.format_name}: {e}")
@@ -637,8 +662,12 @@ def save_results(
                 "Benchmark Success": r.benchmark_success,
                 "mAP@50": round(r.map50, 4) if r.benchmark_success else None,
                 "mAP@50-95": round(r.map5095, 4) if r.benchmark_success else None,
-                "Latency (ms)": round(r.latency_ms, 2) if r.benchmark_success else None,
+                "Latency Avg (ms)": round(r.latency_ms, 2) if r.benchmark_success else None,
+                "Latency p50 (ms)": round(r.latency_p50, 2) if r.benchmark_success else None,
+                "Latency p95 (ms)": round(r.latency_p95, 2) if r.benchmark_success else None,
+                "Latency p99 (ms)": round(r.latency_p99, 2) if r.benchmark_success else None,
                 "FPS": round(r.fps, 2) if r.benchmark_success else None,
+                "Peak RAM (MB)": round(r.ram_peak_mb, 1) if r.benchmark_success else None,
                 "Error": r.error_msg,
             }
         )

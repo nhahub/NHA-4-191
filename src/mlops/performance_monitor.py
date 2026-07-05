@@ -1,11 +1,15 @@
 import logging
+import os
 import time
 from collections import deque
 
+import psutil
 import torch
 
 logger = logging.getLogger(__name__)
 logger.propagate = True
+
+MEMORY_BUDGET_MB = 2048  # KPI SP-11: RAM < 2 GB
 
 
 class PerformanceMonitor:
@@ -15,6 +19,7 @@ class PerformanceMonitor:
         self.request_count = 0
         self.error_count = 0
         self.start_time = time.monotonic()
+        self.process = psutil.Process(os.getpid())
 
     def record_request(self) -> None:
         self.request_count += 1
@@ -51,12 +56,31 @@ class PerformanceMonitor:
                 }
             )
 
+        stats["ram_rss_mb"] = round(self.process.memory_info().rss / (1024 * 1024), 2)
+
         if torch.cuda.is_available():
             stats["gpu_memory_allocated_mb"] = round(torch.cuda.memory_allocated() / (1024 * 1024), 2)
             stats["gpu_memory_cached_mb"] = round(torch.cuda.memory_reserved() / (1024 * 1024), 2)
 
         return stats
 
+    def check_memory_budget(self) -> dict:
+        current_mb = self.process.memory_info().rss / (1024 * 1024)
+        within_budget = current_mb <= MEMORY_BUDGET_MB
+        if not within_budget:
+            logger.warning(
+                "Memory budget exceeded: %.1f MB > %d MB (KPI SP-11)",
+                current_mb,
+                MEMORY_BUDGET_MB,
+            )
+        return {
+            "ram_rss_mb": round(current_mb, 2),
+            "budget_mb": MEMORY_BUDGET_MB,
+            "within_budget": within_budget,
+        }
+
     def log_stats(self) -> None:
         stats = self.get_stats()
+        budget = self.check_memory_budget()
+        stats["memory_budget_ok"] = budget["within_budget"]
         logger.info("Performance stats: %s", stats)

@@ -38,7 +38,7 @@ Road-Sense detects **vehicles**, **pedestrians**, and **cyclists** in driving sc
 
 ```bash
 # 1. Install
-git clone https://github.com/nhahub/NHA-4-191.git
+git clone https://github.com/Abdallah4Z/Road-Sense.git
 cd Road-Sense
 pip install -r requirements.txt
 

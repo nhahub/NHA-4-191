@@ -145,9 +145,3 @@ models/checkpoints/HPO_run/weights/best.torchscript
 !data/samples/**/*.jpg
 
 .coverage
-
-# =====================================
-# Stray Artifact Files
-# =====================================
-preprocess_dataset (1).py
-test_preprocess_dataset.py

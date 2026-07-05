@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Confusion Matrix Explorer - Road-Sense</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, sans-serif; background: #0f172a; color: #e2e8f0; padding: 20px; display: flex; justify-content: center; }
+.container { max-width: 800px; }
+h1 { color: #38bdf8; margin-bottom: 8px; }
+p { color: #94a3b8; margin-bottom: 24px; }
+.matrix { display: grid; grid-template-columns: 80px repeat(3, 120px); gap: 4px; margin-bottom: 24px; }
+.header { font-weight: 700; text-align: center; padding: 12px; color: #94a3b8; }
+.cell { text-align: center; padding: 20px; border-radius: 8px; font-size: 18px; font-weight: 600; }
+.label-row { display: flex; align-items: center; justify-content: flex-end; padding-right: 12px; color: #94a3b8; font-weight: 500; }
+.controls { background: #1e293b; border-radius: 12px; padding: 20px; border: 1px solid #334155; }
+.controls h3 { color: #94a3b8; margin-bottom: 12px; }
+.controls label { display: block; margin: 8px 0; color: #e2e8f0; }
+.controls input[type=range] { width: 200px; vertical-align: middle; }
+.controls .value { color: #38bdf8; font-weight: 600; }
+.classes { color: #3b82f6; font-weight: 600; }
+.misclass { background: #1e293b; border-radius: 12px; padding: 20px; border: 1px solid #334155; margin-top: 20px; }
+.misclass h3 { color: #94a3b8; margin-bottom: 12px; }
+.misclass li { margin: 6px 0; padding: 8px; background: #0f172a; border-radius: 6px; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🔍 Confusion Matrix Explorer</h1>
+<p>YOLO11m HPO — KITTI Validation Set (3 classes)</p>
+<div class="matrix" id="matrix"></div>
+<div class="controls">
+  <h3>⚙️ Filter Controls</h3>
+  <label>Confidence Threshold: <input type="range" min="0" max="100" value="50" id="threshold"> <span class="value" id="threshVal">0.50</span></label>
+  <p style="color:#94a3b8;margin-top:8px">Class mapping: <span class="classes">0=Vehicle</span> · <span class="classes">1=Pedestrian</span> · <span class="classes">2=Cyclist</span></p>
+</div>
+<div class="misclass">
+  <h3>📋 Common Misclassifications</h3>
+  <ul>
+    <li><strong>Vehicle → Pedestrian</strong>: Rare — typically tall vehicles (trucks) with pedestrian-like proportions</li>
+    <li><strong>Pedestrian → Vehicle</strong>: Occurs when pedestrians are very close to vehicles; occlusion causes confusion</li>
+    <li><strong>Cyclist → Pedestrian</strong>: Most common error — cyclists viewed from the side lose the bicycle profile</li>
+    <li><strong>Cyclist → Vehicle</strong>: Motorcycles/mopeds at distance resemble small vehicles</li>
+  </ul>
+</div>
+</div>
+<script>
+const data = [[1553,12,5],[8,281,18],[3,7,100]];
+const labels = ['Vehicle','Pedestrian','Cyclist'];
+const maxVal = Math.max(...data.flat());
+const colors = (v,r) => {
+  if (r) return `rgba(56,189,248,${0.2+v/maxVal*0.8})`;
+  return v > 0 ? `rgba(239,68,68,${0.2+v/maxVal*0.6})` : '#1e293b';
+};
+function render(t) {
+  const m = document.getElementById('matrix');
+  m.innerHTML = '<div class="header"></div>' + labels.map(l => `<div class="header">${l}</div>`).join('');
+  labels.forEach((r,i) => {
+    m.innerHTML += `<div class="label-row">${r}</div>`;
+    labels.forEach((_,j) => {
+      const v = i === j ? data[i][j] : Math.round(data[i][j] * Math.min(1, t/0.5));
+      m.innerHTML += `<div class="cell" style="background:${colors(v,i===j)};color:${i===j?'#fff':'#f87171'}">${v}</div>`;
+    });
+  });
+}
+render(0.5);
+document.getElementById('threshold').addEventListener('input', function() {
+  const v = this.value / 100;
+  document.getElementById('threshVal').textContent = v.toFixed(2);
+  render(v);
+});
+</script>
+</body>
+</html>

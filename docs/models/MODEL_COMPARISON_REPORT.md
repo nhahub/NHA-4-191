@@ -99,3 +99,31 @@ python3 benchmark_models.py --device cpu
 Current benchmark artifacts used in this report:
 - `artifacts/model_benchmark_results.cuda.csv`
 - `artifacts/model_benchmark_results.cpu.csv`
+
+---
+
+## 10. KITTI Fine-Tuned Results
+
+The tables above represent **COCO128 pre-trained** models. After fine-tuning on KITTI (3 classes: Vehicle, Pedestrian, Cyclist), the models achieved:
+
+### Comparison: KITTI-Trained YOLO11m vs Fine-Tuned Faster R-CNN
+
+| Metric | YOLO11m Baseline | YOLO11m HPO | Faster R-CNN (10 epochs) |
+|--------|:----------------:|:-----------:|:-----------------------:|
+| **mAP@50** | **0.942** | 0.935 | N/A |
+| **mAP@50:95** | **0.768** | 0.725 | N/A |
+| **Precision** | 0.870 | **0.893** | 0.843 |
+| **Recall** | 0.830 | **0.894** | 0.897 |
+| **F1 Score** | ~0.849 | **~0.893** | 0.869 |
+| **FPS (RTX 3050)** | 33.6 | **36.4** | N/A |
+| **Model Size** | 38.8 MB | 38.8 MB | ~167 MB |
+| **Training Data** | 5236 images | 5236 images | 2067 images |
+| **Epochs** | 100 | 100 | 10 |
+
+> Full details in `reports/TRAINING_COMPARISON_REPORT.md`
+
+### Key Takeaways from Fine-Tuning
+- **YOLO11m HPO** is the best KITTI-trained model: highest precision (0.893), strong recall (0.894), and real-time speed
+- **Faster R-CNN** shows competitive recall (0.897) but lower precision (0.843); only 10 epochs of training vs 100 for YOLO
+- **ONNX FP16 export** further improves speed to **44.1 FPS** without accuracy loss (see `reports/MODEL_EVALUATION_REPORT.md`)
+- **TFLite INT8 quantization** reduces model size to **19.7 MB** (51% smaller) with zero accuracy loss
